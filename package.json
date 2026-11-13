@@ -11,9 +11,12 @@
     "test:shots": "vite build && node tests/run.cjs shots"
   },
   "dependencies": {
-    "three": "^0.187.0"
+    "@tresjs/core": "^5.11.0",
+    "three": "^0.187.0",
+    "vue": "^3.5.45"
   },
   "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.11",
     "vite": "^8.3.8"
   }
 }

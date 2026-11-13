@@ -263,3 +263,17 @@ section.appendix input[type=search]:focus-visible { outline: none; border-color:
 .term a { display: block; color: var(--star); text-decoration: none; }
 .term a:hover, .term a:focus-visible { text-decoration: underline; outline: none; }
 .term span { display: block; color: var(--muted); font-size: 14px; line-height: 1.7; }
+
+/* ---------- 後記 ---------- */
+a.link {
+  font-size: 14px; color: var(--sage); text-decoration: none;
+  border: 1px solid var(--sage); border-radius: 999px; padding: 5px 15px;
+}
+a.link:hover, a.link:focus-visible { color: #fff; outline: none; }
+code { font: 13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #b9bccb; }
+table.cmp { width: 100%; border-collapse: collapse; margin: 0 0 22px; font-size: 14px; }
+table.cmp th, table.cmp td { text-align: left; padding: 8px 8px 8px 0; border-top: 1px solid var(--line); vertical-align: top; }
+table.cmp thead th { border-top: 0; color: var(--sage); font-weight: 400; font-size: 12px; letter-spacing: .08em; }
+table.cmp tbody th { color: var(--star); font-weight: 400; white-space: nowrap; }
+table.cmp td { color: var(--muted); }
+table.cmp td[colspan] { color: var(--text); }

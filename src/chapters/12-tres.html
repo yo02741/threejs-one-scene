@@ -1,0 +1,84 @@
+<div class="chapter" id="ch12">
+
+  <section data-chapter="PS" data-step="0">
+    <p class="kicker"><span class="brand">ひとめぐり</span>　星空教本　後記</p>
+    <h1>後記<br>換一種寫法</h1>
+    <p class="lead">這本書從頭到尾用的是原生的 three.js：自己建場景、自己把東西加進去、自己跑迴圈。實際做網站時，很多人會在上面再套一層框架。這一篇把同一個成品用 TresJS（Vue 的 three.js 框架）重寫了一次，看它省了什麼、又拿走了什麼。</p>
+    <div class="panel"><div class="btns"><a class="link" href="./tres/">打開 TresJS 版 ↗</a></div></div>
+    <p class="lead">兩邊看起來應該一模一樣。差別全部在程式碼裡。</p>
+  </section>
+
+  <section data-chapter="PS" data-step="1">
+    <p class="kicker">01　DECLARATIVE</p>
+    <h2>同一顆星，兩種寫法</h2>
+    <p>這是原生的寫法，也是第二章教你的那四行：</p>
+    <pre>const shape   = new THREE.IcosahedronGeometry(1, 2);
+const surface = new THREE.MeshStandardMaterial({
+  color: 0xecdcae, roughness: 0.45, flatShading: true });
+const star    = new THREE.Mesh(shape, surface);
+scene.add(star);</pre>
+    <p>這是 TresJS 的寫法：</p>
+    <pre>&lt;TresMesh&gt;
+  &lt;TresIcosahedronGeometry :args="[1, 2]" /&gt;
+  &lt;TresMeshStandardMaterial color="#ecdcae"
+    :roughness="0.45" flat-shading /&gt;
+&lt;/TresMesh&gt;</pre>
+    <p>上面是<strong>命令式</strong>：一步一步告訴電腦「做這個、再做那個」。下面是<strong>宣告式</strong>：只描述「場景裡有什麼」，建立、加進場景、之後的更新和清除，都由框架去做。</p>
+    <p>注意那些名字：<code>IcosahedronGeometry</code>、<code>MeshStandardMaterial</code>、<code>roughness</code>、<code>flatShading</code>。一個字都沒變。框架換掉的是「怎麼組裝」，不是「組裝什麼」。</p>
+    <p class="lead">所以這本書的詞彙在框架裡完全通用。你描述畫面的方式不需要改。</p>
+  </section>
+
+  <section data-chapter="PS" data-step="2">
+    <p class="kicker">02　WHAT YOU GET</p>
+    <h2>框架替你做的事</h2>
+    <p>重寫的過程中，這些事不用再自己處理：</p>
+    <dl class="plain">
+      <dt>開場的雜事</dt><dd>建立 renderer、接上 canvas、視窗縮放時更新相機和解析度。原生版要十幾行，這裡是一個 <code>&lt;TresCanvas&gt;</code>。</dd>
+      <dt>加進去，和拿出來</dt><dd>模板裡有的東西就在場景裡；條件不成立就自動移除，並釋放它佔的記憶體。原生版的「拆鷹架」每一樣都要自己記得。</dd>
+      <dt>旋鈕</dt><dd>屬性可以直接綁資料：資料一變，場景跟著變。這本書為了做到這件事，自己寫了一整套「場景參數」的機制。</dd>
+      <dt>指標事件</dt><dd>在物件上寫 <code>@click</code>、<code>@pointerenter</code> 就好。第十章的射線檢測，框架在背後替你做了。</dd>
+      <dt>和頁面其他部分說話</dt><dd>場景就是一個 Vue 元件。頁面的狀態（讀到哪裡、載入好了沒、現在是什麼語言）可以直接傳進去。</dd>
+    </dl>
+    <p class="lead">省下來的幾乎都是「接線」。這些事不難，但很瑣碎，而且容易漏。</p>
+  </section>
+
+  <section data-chapter="PS" data-step="3">
+    <p class="kicker">03　WHAT YOU GIVE UP</p>
+    <h2>框架沒有替你做的事</h2>
+    <p>TresJS 版的場景檔是 186 行，其中宣告式的模板只有 44 行。剩下的四分之三，和原生的寫法幾乎一樣：</p>
+    <dl class="plain">
+      <dt>每一幀的動作</dt><dd>自轉、漂浮、彈簧、相機運鏡、四十顆小星的位置，還是要拿到物件、在每一幀親手改它。宣告式只描述「有什麼」，不描述「怎麼動」。</dd>
+      <dt>Shader</dt><dd>GLSL 原封不動。兩個版本用的是同一批檔案。</dd>
+      <dt>粒子的資料</dt><dd>兩千多顆星放在哪裡、多亮，還是那個迴圈。</dd>
+      <dt>後製</dt><dd>框架預設「畫完直接上螢幕」。要插進後製，得把它的渲染那一步換成自己的；或者再裝一個後製套件，多學一套寫法。</dd>
+      <dt>踩過的坑</dt><dd>第八章「後製下底色變灰」的問題，在這裡原樣再出現一次。框架不會替你擋掉 three.js 本身的行為。</dd>
+    </dl>
+    <p>另外多了一樣東西：出錯的時候，你要先分辨問題在 three.js 還是在框架那一層。如果不懂底下那一層，這一步會很難。</p>
+    <p class="lead">框架把簡單的事變得更簡單，困難的事維持一樣困難。這本書教的，剛好是困難的那一半。</p>
+  </section>
+
+  <section data-chapter="PS" data-step="4">
+    <p class="kicker">04　CHOOSING</p>
+    <h2>所以，正式的開場該用哪一種</h2>
+    <table class="cmp">
+      <thead><tr><th></th><th>原生 three.js</th><th>TresJS</th></tr></thead>
+      <tbody>
+        <tr><th>建立與清理</th><td>自己寫、自己記得</td><td>框架處理</td></tr>
+        <tr><th>旋鈕與頁面狀態</th><td>自己做一套機制</td><td>直接綁資料</td></tr>
+        <tr><th>點擊與懸停</th><td>自己射線檢測</td><td>寫在物件上</td></tr>
+        <tr><th>每一幀的動畫</th><td colspan="2">一樣：拿到物件，每一幀改它</td></tr>
+        <tr><th>Shader、粒子</th><td colspan="2">一樣：同一批程式碼</td></tr>
+        <tr><th>後製</th><td>直接接上</td><td>要繞一步</td></tr>
+        <tr><th>渲染迴圈</th><td>完全在你手上</td><td>在框架手上，要用的時候借出來</td></tr>
+        <tr><th>除錯</th><td>一層</td><td>兩層</td></tr>
+      </tbody>
+    </table>
+    <p>我的建議分兩種情況：</p>
+    <p><strong>如果網站本身是用 Vue 寫的</strong>，開場用 TresJS。開場不是孤立的一頁，它要知道頁面載入好了沒、使用者捲到哪裡、什麼時候該讓位給內容。這些「和頁面說話」的事，正是框架省最多的地方。</p>
+    <p><strong>如果開場是獨立的一頁，或網站不是 Vue</strong>，用原生就好，像這本書一樣。為了一個場景多背一層框架不划算。</p>
+    <p>不管哪一種，都把 shader、粒子的資料、動畫的算式寫成和框架無關的獨立檔案，就像這次兩個版本共用同一批 shader。框架只當外殼。這樣以後要換框架、或把框架拿掉，核心的東西一行都不用重寫。</p>
+    <p class="lead">這本書到這裡結束。你從一塊黑色開始，現在知道每一樣東西是怎麼來的、該怎麼說、以及哪些可以不要。</p>
+    <ol class="next" data-toc="12"></ol>
+  </section>
+
+</div>

@@ -151,7 +151,7 @@ export function bindChapter(root, local, ctx, opts = {}) {
 export function buildGlossary(book) {
   const groups = [];
   book.querySelectorAll('.chapter').forEach((ch, ci) => {
-    const dl = ch.querySelector('dl');
+    const dl = ch.querySelector('dl:not(.plain)');
     if (!dl) return;
     const strongs = Array.from(ch.querySelectorAll('section strong'));
     const items = Array.from(dl.querySelectorAll('dt')).map((dt) => {
