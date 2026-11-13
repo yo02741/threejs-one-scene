@@ -1,5 +1,5 @@
 // 第 7 章：包在星星外面的一層殼，用自己寫的 shader 畫成光暈。
-import { AdditiveBlending, Color, IcosahedronGeometry, Mesh, ShaderMaterial } from 'three';
+import { AdditiveBlending, Color, NormalBlending, IcosahedronGeometry, Mesh, ShaderMaterial } from 'three';
 import noise from '../shaders/noise.glsl?raw';
 import vert from '../shaders/glow.vert.glsl?raw';
 import frag from '../shaders/glow.frag.glsl?raw';
@@ -35,6 +35,9 @@ export function createGlow(scene, star) {
       u.uFres.value = G.fres; u.uPow.value = G.pow; u.uInt.value = G.int;
       u.uNScale.value = G.nScale; u.uNSpeed.value = G.nSpeed; u.uNAmt.value = G.nAmt;
       u.uDisp.value = G.disp; u.uDispFreq.value = G.dispFreq;
+      // 還只是一層有顏色的殼時用一般混合；變成光暈之後用加法混合（疊上去會變亮）
+      const blend = G.fres < 0.5 ? NormalBlending : AdditiveBlending;
+      if (mat.blending !== blend) { mat.blending = blend; mat.needsUpdate = true; }
       follow();
     },
     animate(dt, S) {

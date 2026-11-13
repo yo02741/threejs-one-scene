@@ -1,6 +1,6 @@
 // 第 6 章：背景的點狀星（Points），與中景的小多面體（InstancedMesh）。
 import {
-  AdditiveBlending, BufferGeometry, CanvasTexture, Color, Float32BufferAttribute, Group,
+  AdditiveBlending, BufferAttribute, BufferGeometry, CanvasTexture, Color, Group,
   IcosahedronGeometry, InstancedMesh, Mesh, MeshStandardMaterial, NormalBlending, Object3D,
   Points, PointsMaterial, ShaderMaterial,
 } from 'three';
@@ -39,11 +39,12 @@ export function createParticles(scene, renderer) {
   const geo = new BufferGeometry();
   const pos = new Float32Array(MAX_POINTS * 3), col = new Float32Array(MAX_POINTS * 3);
   const size = new Float32Array(MAX_POINTS), bright = new Float32Array(MAX_POINTS), phase = new Float32Array(MAX_POINTS);
-  geo.setAttribute('position', new Float32BufferAttribute(pos, 3));
-  geo.setAttribute('color', new Float32BufferAttribute(col, 3));
-  geo.setAttribute('aSize', new Float32BufferAttribute(size, 1));
-  geo.setAttribute('aBright', new Float32BufferAttribute(bright, 1));
-  geo.setAttribute('aPhase', new Float32BufferAttribute(phase, 1));
+  // 用 BufferAttribute（不複製）：之後直接改這幾個陣列，再標記 needsUpdate
+  geo.setAttribute('position', new BufferAttribute(pos, 3));
+  geo.setAttribute('color', new BufferAttribute(col, 3));
+  geo.setAttribute('aSize', new BufferAttribute(size, 1));
+  geo.setAttribute('aBright', new BufferAttribute(bright, 1));
+  geo.setAttribute('aPhase', new BufferAttribute(phase, 1));
 
   const simple = new PointsMaterial({ map: spotTexture(), vertexColors: true, transparent: true });
   const shader = new ShaderMaterial({
@@ -116,7 +117,7 @@ export function createParticles(scene, renderer) {
       const th = r() * Math.PI * 2, y = r() * 2 - 1, s = Math.sqrt(1 - y * y), rad = 3.2 + Math.pow(r(), 0.7) * 11;
       data.push({
         x: Math.cos(th) * s * rad, y: y * rad * 0.7, z: Math.sin(th) * s * rad,
-        s: 0.05 + r() * 0.16, rx: (r() - 0.5) * 1.2, ry: (r() - 0.5) * 1.2, ph: r() * 6.28, sp: 0.3 + r() * 0.5,
+        s: 0.03 + r() * 0.1, rx: (r() - 0.5) * 1.2, ry: (r() - 0.5) * 1.2, ph: r() * 6.28, sp: 0.3 + r() * 0.5,
       });
     }
   }

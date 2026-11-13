@@ -1,0 +1,119 @@
+<div class="chapter" id="ch6">
+
+  <section data-chapter="06" data-step="0">
+    <p class="kicker"><span class="brand">ひとめぐり</span>　星空教本</p>
+    <h1>第六章<br>一片星空</h1>
+    <p class="lead">五章以來，畫面上只有一顆星。這一章結束時，它不再孤單：背後有三千顆遠方的星，身邊漂著幾十顆小的。</p>
+    <p class="lead">相機退後了。周圍那一大片空，就是等一下要填的地方。</p>
+  </section>
+
+  <section data-chapter="06" data-step="1">
+    <p class="kicker">01　POINTS</p>
+    <h2>三千顆星，一個物件</h2>
+    <p>場景裡已經放了三千顆星，但你只看得到幾顆。先別動數量，把「遠裁面」往右拉。</p>
+    <div class="panel">
+      <div class="row"><label>遠裁面</label><input type="range" data-k="far" min="14" max="200" step="2"><output data-o="far"></output></div>
+      <div class="row"><label>數量</label><input type="range" data-k="count" min="100" max="50000" step="100"><output data-o="count"></output></div>
+      <div class="row"><label>大小</label><input type="range" data-k="size" min="0.1" max="2" step="0.05"><output data-o="size"></output></div>
+      <label class="check"><input type="checkbox" data-k="atten"> 近大遠小</label>
+    </div>
+    <pre>const stars = new THREE.Points(
+  geometry,  <i>// 一個幾何，裡面有 <b data-c="count"></b> 個點</i>
+  new THREE.PointsMaterial({ size: <b data-c="size"></b>, sizeAttenuation: <b data-c="atten"></b> })
+);
+camera.far = <b data-c="far"></b>;</pre>
+    <p>第一章說過：東西莫名消失，通常是跑到相機看得到的範圍外了。遠裁面從第一章到現在都是 14，而這些星星在幾十個單位之外。這是那個詞第一次真的派上用場。</p>
+    <p>現在把數量拉到五萬，看左上角的 <strong>draw call</strong>（顯示卡被叫去畫一次，算一個）。數字不會變。這些星星用的是<strong>點</strong>（Points）：一個物件裡裝很多個位置，每個位置畫一個小光斑，全部一次畫完。</p>
+    <p class="lead">一萬顆星不是一萬個物件。數量本身不貴，「分開畫」才貴。</p>
+  </section>
+
+  <section data-chapter="06" data-step="2">
+    <p class="kicker">02　DISTRIBUTION</p>
+    <h2>好看的隨機是設計出來的</h2>
+    <p>遠裁面已經放寬了。按三種形狀比較，再拉「聚集」和「亮度落差」。</p>
+    <div class="panel">
+      <div class="btns">
+        <button type="button" data-k="shape" data-v="box">方盒</button>
+        <button type="button" data-k="shape" data-v="shell">球殼</button>
+        <button type="button" data-k="shape" data-v="band">傾斜的帶狀</button>
+      </div>
+      <div class="row"><label>聚集</label><input type="range" data-k="cluster" min="0" max="0.9" step="0.05"><output data-o="cluster"></output></div>
+      <div class="row"><label>亮度落差</label><input type="range" data-k="bright" min="0" max="1" step="0.05"><output data-o="bright"></output></div>
+      <div class="btns"><button type="button" id="reseed">換一組亂數</button></div>
+    </div>
+    <pre>const random = seeded(<b data-c="seed"></b>);  <i>// 同一個種子，永遠同一片星空</i>
+for (let i = 0; i &lt; <b data-c="count"></b>; i++) {
+  positions[i] = 在「<b data-shape></b>」裡挑一個位置;
+  brightness[i] = 多數很暗、少數很亮;  <i>// 落差 <b data-c="bright"></b></i>
+}</pre>
+    <p>「方盒」是最單純的亂數：每個位置機會均等。它看起來像雜訊，不像星空。真實的星空有結構：星星沿著一條帶聚集（<strong>分佈</strong>），有的地方擠、有的地方空（<strong>聚集</strong>），而且絕大多數很暗，只有少數幾顆特別亮。</p>
+    <p>「換一組亂數」多按幾次。形狀的規則不變，只是骰子重擲。用固定的<strong>種子</strong>，就能把喜歡的那一次留下來。</p>
+    <p class="lead">「隨機」是一個需要描述的東西：什麼形狀、多密、落差多大。</p>
+  </section>
+
+  <section data-chapter="06" data-step="3">
+    <p class="kicker">03　BLENDING</p>
+    <h2>光疊在一起會變亮</h2>
+    <p>切到「一般混合」，再勾選「寫入深度」，靠近看那些星星。</p>
+    <div class="panel">
+      <div class="btns">
+        <button type="button" data-k="additive" data-v="true">加法混合</button>
+        <button type="button" data-k="additive" data-v="false">一般混合</button>
+      </div>
+      <label class="check"><input type="checkbox" data-k="depthWrite"> 寫入深度</label>
+      <div class="row"><label>大小</label><input type="range" data-k="size" min="0.1" max="2" step="0.05"><output data-o="size"></output></div>
+    </div>
+    <pre>material.blending = THREE.<b data-blend></b>;
+material.depthWrite = <b data-c="depthWrite"></b>;</pre>
+    <p>每顆星其實是一張方形的小貼片，中間亮、邊緣透明。「寫入深度」打開時，每張貼片會宣告「我在這裡，後面的不用畫」，連透明的邊角也算，於是你會看到一個個方形的缺口。</p>
+    <p><strong>加法混合</strong>是把顏色直接加上去：兩顆星重疊的地方更亮，像真的光。它不需要知道誰在前誰在後，所以可以關掉深度寫入，缺口也就消失了。</p>
+    <p class="lead">會發光的東西幾乎都用加法混合。半透明物體互相遮擋的問題，它也是最常見的解法。</p>
+  </section>
+
+  <section data-chapter="06" data-step="4">
+    <p class="kicker">04　INSTANCING</p>
+    <h2>同一個形狀，畫很多次</h2>
+    <p>主星身邊多了一些小多面體。現在每一顆是獨立的物件。把數量拉到 2000，看 draw call 和毫秒數；然後按「一次畫完」。</p>
+    <div class="panel">
+      <div class="btns">
+        <button type="button" data-k="instanced" data-v="false">每顆一個物件</button>
+        <button type="button" data-k="instanced" data-v="true">一次畫完</button>
+      </div>
+      <div class="row"><label>小星數量</label><input type="range" data-k="minis" min="10" max="2000" step="10"><output data-o="minis"></output></div>
+    </div>
+    <pre>const minis = new THREE.InstancedMesh(shape, surface, <b data-c="minis"></b>);
+minis.setMatrixAt(i, 位置與旋轉);  <i>// 每顆只多存一組位置</i></pre>
+    <p>點很便宜，但它只是一張永遠面向你的貼片。這些小星是真的多面體：有面、有稜角，吃得到第二章的材質和第三章的光，會自轉、會漂浮。</p>
+    <p><strong>Instancing</strong> 的意思是：形狀和材質只準備一份，然後告訴顯示卡「同樣的東西，在這兩千個位置各畫一次」。兩千個 draw call 變成一個。</p>
+    <p class="lead">草地、人群、碎片、星群：畫面上只要有「很多個一樣的東西」，就是它。</p>
+    <details class="more">
+      <summary>補充：畫很多東西的三種方法</summary>
+      <div>
+        <p><strong>點</strong>：最便宜，數十萬顆也行。但每顆只是一張面向相機的貼片，沒有體積。適合遠景、塵埃、火花。</p>
+        <p><strong>Instancing</strong>：同一個形狀重複很多次，每顆可以有自己的位置、旋轉、大小、顏色。適合幾百到幾萬個「同款」物體。</p>
+        <p><strong>合併幾何</strong>：把很多個不同的靜態形狀事先焊成一個。畫起來最快，但焊完就不能個別移動。適合不會動的場景。</p>
+        <p>三者解決的是同一個問題：減少 draw call。</p>
+      </div>
+    </details>
+  </section>
+
+  <section data-chapter="06" data-step="5">
+    <p class="kicker">05　怎麼說</p>
+    <h2>這一章給你的詞彙</h2>
+    <p>計數器拆了。定下來的是：主星，背後一條斜斜的星帶（三千顆點，多數很暗、少數很亮，加法混合），中景四十顆小多面體，各自慢慢轉、慢慢漂。</p>
+    <dl>
+      <dt>粒子／點</dt><dd>一個物件裡的大量小光斑，一次畫完。</dd>
+      <dt>密度</dt><dd>單位空間裡有多少顆。</dd>
+      <dt>分佈／聚集</dt><dd>它們排成什麼形狀、有沒有成團。</dd>
+      <dt>種子</dt><dd>讓「隨機」可以重現的那個數字。</dd>
+      <dt>加法混合</dt><dd>顏色相加，重疊處更亮。發光物的標準做法。</dd>
+      <dt>Instancing</dt><dd>同一個形狀在很多位置各畫一次，只算一個 draw call。</dd>
+      <dt>Draw call</dt><dd>顯示卡被叫去畫一次。效能的主要單位之一。</dd>
+    </dl>
+    <p>同一個需求，從模糊到精確：</p>
+    <blockquote>✕　「背景加一些星星。」</blockquote>
+    <blockquote>○　「大約三千顆點狀的星，分佈在一條斜斜橫過畫面的帶上，多數很小、少數比較亮；中景再放幾十顆小多面體慢慢漂。」</blockquote>
+    <ol class="next" data-toc="6"></ol>
+  </section>
+
+</div>

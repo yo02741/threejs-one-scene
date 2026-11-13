@@ -18,7 +18,7 @@ void main() {
   a *= mix(1.0, n * 1.7, uNAmt);
 
   // 除錯檢視：把位置直接當成顏色畫出來
-  if (uDebug > 0.5) { col = vP * 0.5 + 0.5; a = 0.9; }
+  if (uDebug > 0.5) { col = vP * 0.5 + 0.5; a = 0.85; }
 
   gl_FragColor = vec4(col, a);
   #include <tonemapping_fragment>

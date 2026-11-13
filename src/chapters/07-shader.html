@@ -1,0 +1,113 @@
+<div class="chapter" id="ch7">
+
+  <section data-chapter="07" data-step="0">
+    <p class="kicker"><span class="brand">ひとめぐり</span>　星空教本</p>
+    <h1>第七章<br>一個像素一個像素算</h1>
+    <p class="lead">前面用的材質都是別人寫好的。這一章自己寫一個。結束時，星星外面會有一圈會呼吸的光暈，而你會知道它是怎麼一個像素一個像素算出來的。</p>
+    <p class="lead">做法是在星星外面加一層稍微大一點的殼。星星本身不動，前幾章的成果都留著。</p>
+  </section>
+
+  <section data-chapter="07" data-step="1">
+    <p class="kicker">01　FRAGMENT SHADER</p>
+    <h2>每個像素問一次：你是什麼顏色</h2>
+    <p>星星外面多了一層殼。換兩個顏色，切換方向，然後打開「除錯檢視」。</p>
+    <div class="panel">
+      <label class="check"><input type="checkbox" data-k="on"> 顯示這層殼</label>
+      <div class="row colors">
+        <label>顏色 A</label><input type="color" data-k="a">
+        <label>顏色 B</label><input type="color" data-k="b">
+      </div>
+      <div class="btns">
+        <button type="button" data-k="dir" data-v="0">上下漸層</button>
+        <button type="button" data-k="dir" data-v="1">左右漸層</button>
+      </div>
+      <label class="check"><input type="checkbox" data-k="debug"> 除錯檢視：把位置當成顏色</label>
+    </div>
+    <pre>void main() {
+  vec3 color = mix(顏色B, 顏色A, 位置.<b data-axis></b>);
+  gl_FragColor = vec4(color, 0.5);
+}</pre>
+    <p>這一小段叫<strong>片段著色器</strong>。殼蓋到畫面上的每一個像素，都會各自跑一次這個函式：輸入是「我在表面的哪個位置」，輸出是「我的顏色和透明度」。它用的語言叫 GLSL，在顯示卡上執行。</p>
+    <p>除錯檢視把位置的三個數字直接當成紅、綠、藍畫出來。Shader 裡不能印訊息，想知道一個數字是多少，唯一的方法就是把它畫成顏色。這是寫 shader 的人每天在做的事。</p>
+    <p class="lead">Shader 不是「特效」。它是一個對每個像素各跑一次、彼此看不到對方的小函式。</p>
+  </section>
+
+  <section data-chapter="07" data-step="2">
+    <p class="kicker">02　FRESNEL</p>
+    <h2>邊緣亮，中間透明</h2>
+    <p>殼變成一圈光暈了。拉「銳利度」，看那圈光往邊緣收緊或往中間擴散。</p>
+    <div class="panel">
+      <div class="row"><label>銳利度</label><input type="range" data-k="pow" min="0.5" max="6" step="0.1"><output data-o="pow"></output></div>
+      <div class="row"><label>強度</label><input type="range" data-k="int" min="0" max="1.5" step="0.05"><output data-o="int"></output></div>
+    </div>
+    <pre>float 正對程度 = dot(法線, 視線);     <i>// 正對著你是 1，側對著你是 0</i>
+float f = pow(1.0 - 正對程度, <b data-c="pow"></b>);
+gl_FragColor = vec4(color, f * <b data-c="int"></b>);</pre>
+    <p>球的正中央，表面正對著你；越靠近邊緣，表面越是側著。第二章的<strong>法線</strong>在這裡又出現了：用它和視線比較，就知道每個像素「有多側」。越側越亮，這個效果叫<strong>菲涅耳</strong>。</p>
+    <p class="lead">光暈、玻璃的邊、肥皂泡、能量罩，骨子裡都是這三行。</p>
+  </section>
+
+  <section data-chapter="07" data-step="3">
+    <p class="kicker">03　NOISE · UNIFORM</p>
+    <h2>讓它流動</h2>
+    <p>光暈開始流動了。把「尺度」拉大拉小，再按「凍結時間」。</p>
+    <div class="panel">
+      <div class="row"><label>尺度</label><input type="range" data-k="nScale" min="0.3" max="6" step="0.1"><output data-o="nScale"></output></div>
+      <div class="row"><label>速度</label><input type="range" data-k="nSpeed" min="0" max="2" step="0.05"><output data-o="nSpeed"></output></div>
+      <div class="row"><label>影響強度</label><input type="range" data-k="nAmt" min="0" max="1" step="0.05"><output data-o="nAmt"></output></div>
+      <label class="check"><input type="checkbox" data-k="freeze"> 凍結時間</label>
+    </div>
+    <pre>uniform float uTime;  <i>// 每一幀從 JS 送進來</i>
+
+float n = noise(位置 * <b data-c="nScale"></b> + uTime * <b data-c="nSpeed"></b>);
+透明度 *= mix(1.0, n, <b data-c="nAmt"></b>);</pre>
+    <p><strong>噪聲</strong>是一種平滑的亂數：相鄰的位置拿到相近的值，所以看起來像雲、像水紋，不像電視雜訊。「尺度」決定紋路的粗細：小的時候是幾大塊緩慢的明暗，大的時候是細碎的斑點。</p>
+    <p>讓它動的方法是把時間加進去。時間從哪來？從 JS。這種「從外面送進 shader 的數字」叫 <strong>uniform</strong>。你在這本書裡拉過的每一支滑桿，背後都是一個 uniform。</p>
+    <p class="lead">Shader 自己不會記得任何事。它每一幀都從頭算，所有會變的東西都要從外面給。</p>
+  </section>
+
+  <section data-chapter="07" data-step="4">
+    <p class="kicker">04　VERTEX SHADER</p>
+    <h2>形狀也可以用算的</h2>
+    <p>先把「位移」拉到最大看清楚，再拉回很小。然後拉「閃爍」，看背景的星星。</p>
+    <div class="panel">
+      <div class="row"><label>位移</label><input type="range" data-k="disp" min="0" max="0.5" step="0.01"><output data-o="disp"></output></div>
+      <div class="row"><label>位移頻率</label><input type="range" data-k="dispFreq" min="0.5" max="6" step="0.1"><output data-o="dispFreq"></output></div>
+      <div class="row"><label>背景星閃爍</label><input type="range" data-k="twinkle" min="0" max="1" step="0.05"><output data-o="twinkle"></output></div>
+    </div>
+    <pre><i>// 頂點著色器：每個頂點跑一次，在畫之前決定它的位置</i>
+position += normal * noise(position * <b data-c="dispFreq"></b>) * <b data-c="disp"></b>;</pre>
+    <p>Shader 有兩半。前面三段都是片段著色器（決定顏色）；這一段是<strong>頂點著色器</strong>：每個頂點各跑一次，決定它最後落在哪裡。這裡用噪聲把殼的每個頂點沿著法線推出去或拉回來，輪廓就不再是完美的圓。</p>
+    <p>背景的三千顆星也順手換成了 shader 來畫。每顆的大小、亮度、閃爍都在顯示卡上算，三千顆同時閃，CPU 一點事都不用做。</p>
+    <p class="lead">不過 shader 有一件事做不到：一個像素沒辦法問「我旁邊是什麼顏色」。所以模糊、泛光這類效果，要留到下一章。</p>
+    <details class="more">
+      <summary>補充：WebGPU 與 TSL</summary>
+      <div>
+        <p>這一章的 shader 是用 <strong>GLSL</strong> 寫的，跑在 WebGL 上。你之後會看到另外兩個名字。</p>
+        <p><strong>WebGPU</strong> 是瀏覽器裡新一代的繪圖介面，會逐步接替 WebGL。它更快、能做的事更多，但 shader 語言不一樣。</p>
+        <p><strong>TSL</strong> 是 three.js 為此準備的寫法：用 JS 的函式來組 shader，例如 <code>mix(colorB, colorA, positionLocal.y)</code>，再由 three.js 轉成 WebGL 或 WebGPU 各自看得懂的語言。</p>
+        <p>概念完全相同：片段、頂點、uniform、噪聲、菲涅耳，一個都沒變，只是語法不同。這本書用 GLSL，因為現有的教學和範例絕大多數還是它。</p>
+      </div>
+    </details>
+  </section>
+
+  <section data-chapter="07" data-step="5">
+    <p class="kicker">05　怎麼說</p>
+    <h2>這一章給你的詞彙</h2>
+    <p>除錯檢視關了。定下來的是：一圈暖白色的菲涅耳光暈，用低頻的噪聲緩緩流動，輪廓有一點點不規則；背景的星各自閃爍。</p>
+    <dl>
+      <dt>片段著色器</dt><dd>每個像素跑一次，決定顏色。</dd>
+      <dt>頂點著色器</dt><dd>每個頂點跑一次，決定位置。</dd>
+      <dt>Uniform</dt><dd>從 JS 送進 shader 的數字。時間、顏色、所有旋鈕。</dd>
+      <dt>漸層</dt><dd>依位置在兩個顏色之間混合。</dd>
+      <dt>菲涅耳</dt><dd>表面越側越亮。邊緣光。</dd>
+      <dt>噪聲</dt><dd>平滑的亂數。尺度小是大塊緩慢，尺度大是細碎。</dd>
+      <dt>位移／扭曲</dt><dd>用算出來的值去挪動頂點。</dd>
+    </dl>
+    <p>同一個需求，從模糊到精確：</p>
+    <blockquote>✕　「星星要有發光的感覺。」</blockquote>
+    <blockquote>○　「外面包一層菲涅耳光暈：邊緣亮、中心透明，暖白色；用低頻噪聲讓它慢慢流動，強度不要超過 0.6。」</blockquote>
+    <ol class="next" data-toc="7"></ol>
+  </section>
+
+</div>

@@ -9,9 +9,11 @@ import chapter02 from './chapters/02-material.js';
 import chapter03 from './chapters/03-light.js';
 import chapter04 from './chapters/04-motion.js';
 import chapter05 from './chapters/05-scroll.js';
+import chapter06 from './chapters/06-particles.js';
+import chapter07 from './chapters/07-shader.js';
 
 // 依閱讀順序排列；新章節加在後面
-const CHAPTERS = [chapter01, chapter02, chapter03, chapter04, chapter05];
+const CHAPTERS = [chapter01, chapter02, chapter03, chapter04, chapter05, chapter06, chapter07];
 
 const $ = (id) => document.getElementById(id);
 const stageEl = $('stage'), hud = $('hud'), hud2 = $('hud2'), insetEl = $('inset');
