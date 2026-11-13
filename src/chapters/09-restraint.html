@@ -1,0 +1,110 @@
+<div class="chapter" id="ch9">
+
+  <section data-chapter="09" data-step="0">
+    <p class="kicker"><span class="brand">ひとめぐり</span>　星空教本</p>
+    <h1>第九章<br>拿掉</h1>
+    <p class="lead">這一章不加任何東西。結束時，畫面上的東西會變少，而它會是一件完成的作品。</p>
+    <p class="lead">為了有東西可以拿，前八章的效果現在全部開到了偏多的程度：泛光更強、景深打開、顆粒更重、星星更多。看起來很熱鬧。先記住這個畫面。</p>
+  </section>
+
+  <section data-chapter="09" data-step="1">
+    <p class="kicker">01　BUDGET</p>
+    <h2>一幀只有 16.6 毫秒</h2>
+    <p>左下角多了一張圖：每一條是一幀花的時間，橫線是 16.6 毫秒。左上角是目前的數字。把「像素比」從 2 換成 1，看數字怎麼變；再換「粒子倍率」比較。</p>
+    <div class="panel">
+      <div class="btns">
+        <button type="button" data-k="pr" data-v="1">1</button>
+        <button type="button" data-k="pr" data-v="1.5">1.5</button>
+        <button type="button" data-k="pr" data-v="2">2</button>
+        <button type="button" data-k="pr" data-v="4">裝置原生</button>
+      </div>
+      <p class="note">像素比。你的螢幕是 <span id="dpr"></span>；高於這個數字的選項不會有差別。</p>
+      <div class="row"><label>粒子倍率</label><input type="range" data-k="mul" min="0.1" max="8" step="0.1"><output data-o="mul" data-u="×"></output></div>
+      <label class="check"><input type="checkbox" data-k="postOn"> 後製</label>
+    </div>
+    <pre>renderer.setPixelRatio(Math.min(window.devicePixelRatio, <b data-c="pr"></b>));</pre>
+    <p>每秒 60 張，等於每一張只有 16.6 毫秒。超過了，畫面就會掉格。這個時間叫<strong>幀率預算</strong>，場景裡的每一樣東西都在花它。</p>
+    <p><strong>像素比</strong>是「一個 CSS 像素實際用幾個螢幕像素畫」。手機常常是 3，也就是同樣大小的畫面要算九倍的像素。而且每一道後製都是「整張圖重算一次」，所以這個九倍還要再乘上後製的關數。</p>
+    <p class="lead">最貴的通常不是三角形數，是像素數。粒子多八倍沒什麼感覺，像素比多一級馬上有感。</p>
+  </section>
+
+  <section data-chapter="09" data-step="2">
+    <p class="kicker">02　SUBTRACT</p>
+    <h2>一樣一樣關掉</h2>
+    <p>八個開關，對應前面八章加進來的東西。一次關一個，每關一個就問自己：畫面有變差嗎？還是只是變得不一樣？</p>
+    <div class="panel">
+      <div class="checks">
+        <label class="check"><input type="checkbox" data-k="bloom"> 泛光</label>
+        <label class="check"><input type="checkbox" data-k="dof"> 景深</label>
+        <label class="check"><input type="checkbox" data-k="grain"> 顆粒</label>
+        <label class="check"><input type="checkbox" data-k="vig"> 暗角</label>
+        <label class="check"><input type="checkbox" data-k="flow"> 光暈流動</label>
+        <label class="check"><input type="checkbox" data-k="disp"> 輪廓位移</label>
+        <label class="check"><input type="checkbox" data-k="minis"> 中景小星</label>
+        <label class="check"><input type="checkbox" data-k="float"> 漂浮與閃爍</label>
+      </div>
+      <div class="btns">
+        <button type="button" data-set='{"bloom":true,"dof":true,"grain":true,"vig":true,"flow":true,"disp":true,"minis":true,"float":true}'>全開</button>
+        <button type="button" data-set='{"bloom":true,"dof":false,"grain":false,"vig":true,"flow":true,"disp":false,"minis":true,"float":true}'>我的版本</button>
+      </div>
+    </div>
+    <p>你會發現有幾樣關掉之後幾乎看不出差別，卻省下不少毫秒（景深是最明顯的一個：它讓場景多畫一遍）。也有幾樣一關掉，畫面就死了（漂浮通常是）。</p>
+    <p>「我的版本」是這本書最後留下來的組合，不是標準答案。</p>
+    <p class="lead">加效果很容易。知道哪一樣可以不要，才是判斷力。這種判斷只能靠關掉來練。</p>
+  </section>
+
+  <section data-chapter="09" data-step="3">
+    <p class="kicker">03　SPACE</p>
+    <h2>留地方給別的東西</h2>
+    <p>畫面已經換成克制的版本了。現在把「標題字」打開，再拉「主星位置」，把星星從正中央移開。</p>
+    <div class="panel">
+      <label class="check"><input type="checkbox" data-k="title"> 標題字</label>
+      <div class="row"><label>主星位置</label><input type="range" data-k="heroX" min="0" max="1" step="0.01"><output data-o="heroX"></output></div>
+      <div class="row"><label>背景星密度</label><input type="range" data-k="density" min="0.1" max="2" step="0.05"><output data-o="density" data-u="×"></output></div>
+    </div>
+    <pre>camera.lookAt(<b data-c="heroX"></b> * 偏移量, 0, 0);  <i>// 相機看向星星的右邊，星星就落在畫面左邊</i></pre>
+    <p>這個場景最後是一個網站的開場，不是一件展示品。它上面會有標題、有按鈕、有人要讀的字。星星在正中央時，字沒有地方放；移到左邊三分之一，右邊就空出來了。那塊空叫<strong>留白</strong>，它是畫面的一部分。</p>
+    <p>再把背景星的密度拉到最高：字開始難讀了。一個畫面只能有一個<strong>焦點</strong>，其他東西的工作是不要搶。</p>
+    <p class="lead">做開場的時候，最重要的那個元素往往不在 3D 場景裡。</p>
+  </section>
+
+  <section data-chapter="09" data-step="4">
+    <p class="kicker">04　EVERY DEVICE</p>
+    <h2>不是每個人都看得到同一個畫面</h2>
+    <p>三顆按鈕，模擬三種你的裝置上不會發生的情況。</p>
+    <div class="panel">
+      <div class="btns">
+        <button type="button" data-k="sim" data-v="none">正常</button>
+        <button type="button" data-k="sim" data-v="low">低階裝置</button>
+        <button type="button" data-k="sim" data-v="reduced">減少動態</button>
+        <button type="button" data-k="sim" data-v="nogl">沒有 WebGL</button>
+      </div>
+    </div>
+    <pre>if (低階裝置)  { 像素比 = 1; 粒子減半; 關掉後製; }
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) { 停在一張靜態畫面; }
+if (!WebGL)   { 顯示一張靜態的備援畫面; }</pre>
+    <p><strong>降級</strong>是替跑不動的裝置準備一個比較便宜的版本：東西少一點、解析度低一點，但還是同一個畫面。<strong>減少動態</strong>是使用者在系統裡開的設定，有些人看到大範圍的動畫會暈；尊重它的做法是停在一張好看的靜態畫面。最後，總有瀏覽器開不了 WebGL，這時候要有<strong>備援</strong>：一張圖、一個漸層，什麼都好，就是不能一片空白。</p>
+    <p class="lead">開場卡住或壞掉的時候，使用者看到的不是「3D 效果沒出來」，是「這個網站壞了」。</p>
+  </section>
+
+  <section data-chapter="09" data-step="5">
+    <p class="kicker">05　怎麼說</p>
+    <h2>這一章給你的詞彙</h2>
+    <p>所有的鷹架都拆了，這次是永久的。留下來的是：一顆手摺般的星，偏在左邊；一圈緩慢流動的光暈；一條斜斜的星帶和幾十顆漂著的小星；只有主星在發光。</p>
+    <dl>
+      <dt>幀率預算</dt><dd>每一幀可以花的時間。60 fps 是 16.6 毫秒。</dd>
+      <dt>像素比</dt><dd>實際畫的像素倍數。效能最大的一支旋鈕。</dd>
+      <dt>留白</dt><dd>刻意空下來的地方。給字、給眼睛休息。</dd>
+      <dt>焦點</dt><dd>畫面裡最該被看到的那一個東西。只能有一個。</dd>
+      <dt>降級</dt><dd>替慢的裝置準備的便宜版本。</dd>
+      <dt>備援</dt><dd>完全不能跑的時候顯示的東西。</dd>
+    </dl>
+    <p>同一個需求，從模糊到精確：</p>
+    <blockquote>✕　「再酷一點。」</blockquote>
+    <blockquote>○　「拿掉景深和顆粒，泛光只留主星。主星放在左邊三分之一，右邊留給標題。手機上像素比鎖 1.5、粒子減半；減少動態時停在一張靜態畫面。」</blockquote>
+    <p>九章到這裡結束。你從一塊黑色開始，現在可以用精確的話描述這個畫面的每一個部分。把它從頭播一次。</p>
+    <div class="panel"><div class="btns"><button type="button" id="watch">看成品</button></div></div>
+    <ol class="next" data-toc="9"></ol>
+  </section>
+
+</div>

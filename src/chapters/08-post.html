@@ -1,0 +1,115 @@
+<div class="chapter" id="ch8">
+
+  <section data-chapter="08" data-step="0">
+    <p class="kicker"><span class="brand">ひとめぐり</span>　星空教本</p>
+    <h1>第八章<br>拍下來之後</h1>
+    <p class="lead">到上一章為止，場景畫完就直接送上螢幕。這一章在中間插一道手續。結束時，畫面看起來會像是被鏡頭拍下來的，而不是被電腦算出來的。</p>
+    <p class="lead">這一章不動場景裡的任何東西。動的是「那張圖」。</p>
+  </section>
+
+  <section data-chapter="08" data-step="1">
+    <p class="kicker">01　PIPELINE</p>
+    <h2>先拍下來，再加工</h2>
+    <p>舞台中間多了一條線，可以左右拖。線的左邊是原圖，右邊是加工過的。為了看得出差別，這裡先放一個最簡單的加工：把顏色拿掉。</p>
+    <div class="panel">
+      <label class="check"><input type="checkbox" data-k="on"> 經過後製</label>
+    </div>
+    <pre>const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));  <i>// 1. 把場景拍成一張圖</i>
+composer.addPass(黑白);                            <i>// 2. 加工那張圖</i>
+composer.addPass(new OutputPass());               <i>// 3. 送上螢幕</i></pre>
+    <p><strong>後製</strong>的意思是：場景不直接畫到螢幕上，而是先畫到一張看不見的圖上，然後一關一關地處理那張圖。每一關叫一個 <strong>pass</strong>，內容就是上一章學的片段著色器，只是這次它處理的是整張畫面。</p>
+    <p>後製看不到 3D。它拿到的只是一張平面的圖，不知道哪裡是星星、哪裡是背景，也不知道誰近誰遠。</p>
+    <p class="lead">所以後製裡的一切，都只能靠「這個像素是什麼顏色、多亮」來判斷。記住這件事，下一段會用到。</p>
+  </section>
+
+  <section data-chapter="08" data-step="2">
+    <p class="kicker">02　BLOOM</p>
+    <h2>夠亮的地方會暈開</h2>
+    <p>星星開始發光了。先把「主星亮度」拉回 0.1，光暈會消失。再慢慢拉上來。</p>
+    <div class="panel">
+      <label class="check"><input type="checkbox" data-k="bloom"> 泛光</label>
+      <div class="row"><label>主星亮度</label><input type="range" data-k="emissive" min="0" max="3" step="0.05"><output data-o="emissive"></output></div>
+      <div class="row"><label>閾值</label><input type="range" data-k="thr" min="0" max="1.5" step="0.01"><output data-o="thr"></output></div>
+      <div class="row"><label>強度</label><input type="range" data-k="str" min="0" max="3" step="0.05"><output data-o="str"></output></div>
+      <div class="row"><label>半徑</label><input type="range" data-k="rad" min="0" max="1" step="0.01"><output data-o="rad"></output></div>
+      <label class="check"><input type="checkbox" data-k="tone"> 色調映射</label>
+    </div>
+    <pre>composer.addPass(new UnrealBloomPass(尺寸, <b data-c="str"></b>, <b data-c="rad"></b>, <b data-c="thr"></b>));
+star.material.emissiveIntensity = <b data-c="emissive"></b>;</pre>
+    <p><strong>泛光</strong>（bloom）模仿的是鏡頭和眼睛的一個毛病：太亮的東西會往外暈。它的做法是把畫面裡亮度超過<strong>閾值</strong>的像素挑出來、模糊、再疊回去。</p>
+    <p>注意它挑的是「亮度」，不是「物件」。想只讓主星發光，沒辦法在後製裡指定「這顆」，只能回到場景裡，把主星的自發光調到比其他所有東西都亮，亮到超過閾值。</p>
+    <p>亮度可以超過 1，螢幕卻顯示不了。<strong>色調映射</strong>負責把超出範圍的亮度壓回螢幕能顯示的範圍，同時保留層次。關掉它，亮部會糊成一片死白。</p>
+    <p class="lead">想讓誰發光，就把誰調亮。泛光只是照實反映。</p>
+  </section>
+
+  <section data-chapter="08" data-step="3">
+    <p class="kicker">03　LENS</p>
+    <h2>鏡頭的不完美</h2>
+    <p>三個開關各試一次。景深打開後，拉「焦點距離」，讓清楚的位置從近處的小星移到遠處。</p>
+    <div class="panel">
+      <label class="check"><input type="checkbox" data-k="dof"> 景深</label>
+      <div class="row"><label>焦點距離</label><input type="range" data-k="focus" min="1" max="20" step="0.1"><output data-o="focus"></output></div>
+      <div class="row"><label>光圈</label><input type="range" data-k="aperture" min="0" max="10" step="0.1"><output data-o="aperture"></output></div>
+      <div class="row"><label>顆粒</label><input type="range" data-k="grain" min="0" max="1" step="0.02"><output data-o="grain"></output></div>
+      <div class="row"><label>暗角</label><input type="range" data-k="vig" min="0" max="1" step="0.02"><output data-o="vig"></output></div>
+    </div>
+    <pre>composer.addPass(new BokehPass(scene, camera, { focus: <b data-c="focus"></b>, aperture: <b data-c="aperture"></b> }));
+<i>// 顆粒 <b data-c="grain"></b>、暗角 <b data-c="vig"></b>：寫在最後一關的 shader 裡</i></pre>
+    <p><strong>景深</strong>是只有某個距離清楚、其他地方模糊。<strong>焦點</strong>是清楚的那個距離，光圈越大模糊得越厲害。<strong>顆粒</strong>是底片的雜點，<strong>暗角</strong>是畫面四個角落比較暗。三樣都是真實鏡頭的缺陷，而電腦算出來的畫面太乾淨，加一點缺陷反而可信。</p>
+    <p>景深是這裡唯一「看得到遠近」的後製。它作弊了：為了知道每個像素離相機多遠，它讓場景再多畫一次。</p>
+    <p class="lead">每一樣都要把整張圖重新算過。它們不是免費的，下一章會算這筆帳。</p>
+  </section>
+
+  <section data-chapter="08" data-step="4">
+    <p class="kicker">04　GRADE</p>
+    <h2>最後一關：調色</h2>
+    <p>先按三個預設比較，再自己拉。</p>
+    <div class="panel">
+      <div class="btns">
+        <button type="button" data-set='{"exposure":1,"contrast":1,"sat":1,"cool":0,"warm":0}'>乾淨</button>
+        <button type="button" data-set='{"exposure":0.95,"contrast":1.15,"sat":0.9,"cool":0.8,"warm":0.7}'>電影</button>
+        <button type="button" data-set='{"exposure":1.15,"contrast":0.85,"sat":1.2,"cool":0.2,"warm":1}'>夢幻</button>
+      </div>
+      <div class="row"><label>曝光</label><input type="range" data-k="exposure" min="0.4" max="2" step="0.01"><output data-o="exposure"></output></div>
+      <div class="row"><label>對比</label><input type="range" data-k="contrast" min="0.5" max="1.6" step="0.01"><output data-o="contrast"></output></div>
+      <div class="row"><label>飽和度</label><input type="range" data-k="sat" min="0" max="2" step="0.01"><output data-o="sat"></output></div>
+      <div class="row"><label>暗部偏藍</label><input type="range" data-k="cool" min="0" max="1" step="0.02"><output data-o="cool"></output></div>
+      <div class="row"><label>亮部偏暖</label><input type="range" data-k="warm" min="0" max="1" step="0.02"><output data-o="warm"></output></div>
+    </div>
+    <pre>color *= <b data-c="exposure"></b>;                              <i>// 曝光</i>
+color = mix(灰階(color), color, <b data-c="sat"></b>);          <i>// 飽和度</i>
+color = (color - 0.18) * <b data-c="contrast"></b> + 0.18;       <i>// 對比</i></pre>
+    <p><strong>調色</strong>是對整張圖的顏色做最後調整。這一關是自己寫的，三行就是上一章的片段著色器：輸入是那張圖上這個像素的顏色，輸出是調過的顏色。第一段的「黑白」其實就是把這裡的飽和度設成 0。</p>
+    <p>「暗部偏藍、亮部偏暖」是電影最常見的配色，和第三章「暖主光配冷補光」是同一個道理，只是這次直接作用在整張圖上。</p>
+    <p class="lead">打光決定哪裡亮哪裡暗，調色決定亮的和暗的各是什麼顏色。兩者都是情緒的旋鈕。</p>
+    <details class="more">
+      <summary>補充：後製用什麼做</summary>
+      <div>
+        <p>這一章用的是 three.js 內建的 <strong>EffectComposer</strong>：每個效果一個 pass，依序處理。好處是不用多裝東西，每一關在做什麼也看得很清楚。</p>
+        <p>另一個常見的選擇是 <strong>postprocessing</strong> 這個套件（React Three Fiber 的後製就是包它）。它會把多個效果合併成一關來算，效果一多時明顯比較快，內建的效果也比較齊。</p>
+        <p>兩邊的概念完全通用：都是「先拍下來，再一關一關加工」，泛光、景深、調色的旋鈕也是同一批名字。</p>
+      </div>
+    </details>
+  </section>
+
+  <section data-chapter="08" data-step="5">
+    <p class="kicker">05　怎麼說</p>
+    <h2>這一章給你的詞彙</h2>
+    <p>分割線拆了。定下來的是：只有主星和少數最亮的背景星會泛光；很淡的顆粒和暗角；暗部略偏藍、亮部略偏暖。景深沒有留下來。</p>
+    <dl>
+      <dt>後製／pass</dt><dd>對拍好的圖做加工；每一道加工是一個 pass。</dd>
+      <dt>泛光（bloom）</dt><dd>亮的地方往外暈開。</dd>
+      <dt>閾值</dt><dd>多亮才算「亮」。越高，會發光的東西越少。</dd>
+      <dt>色調映射</dt><dd>把過亮的部分壓回螢幕顯示得了的範圍。</dd>
+      <dt>景深／焦點／散景</dt><dd>只有一個距離清楚；清楚的距離；模糊掉的光點。</dd>
+      <dt>顆粒／暗角</dt><dd>底片的雜點；四角變暗。</dd>
+      <dt>調色</dt><dd>曝光、對比、飽和度，以及暗部亮部各偏什麼顏色。</dd>
+    </dl>
+    <p>同一個需求，從模糊到精確：</p>
+    <blockquote>✕　「要有電影感。」</blockquote>
+    <blockquote>○　「只讓主星泛光：閾值高、半徑大、強度中等。加很淡的顆粒和暗角，暗部偏藍、亮部偏暖。不要景深。」</blockquote>
+    <ol class="next" data-toc="8"></ol>
+  </section>
+
+</div>

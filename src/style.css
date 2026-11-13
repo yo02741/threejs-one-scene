@@ -144,6 +144,7 @@ ol.next li.done span { color: var(--sage); }
 #nav a:hover, #nav a:focus-visible { color: var(--text); outline: none; }
 #nav a.on { color: var(--sage); }
 #nav:has(a:only-child) { display: none; }
+@media (max-width: 899px) { #nav { display: none; } } /* 手機上沒有空間，文字欄會被蓋到 */
 
 /* ---------- 舞台上的附加元件 ---------- */
 #hud2 {

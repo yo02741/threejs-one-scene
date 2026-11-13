@@ -1,5 +1,5 @@
 // 第 8 章：後製。場景先畫到一張圖上，再一關一關處理那張圖。
-import { ACESFilmicToneMapping, Color, NoToneMapping, Vector2 } from 'three';
+import { ACESFilmicToneMapping, NoToneMapping, Vector2 } from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
@@ -8,12 +8,10 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import finalFrag from '../shaders/final.frag.glsl?raw';
 
-export function createPost(renderer, scene, camera, ink) {
+export function createPost(renderer, scene, camera) {
   const composer = new EffectComposer(renderer);
 
   const renderPass = new RenderPass(scene, camera);          // 1. 把場景拍成一張圖
-  renderPass.clearColor = new Color(ink);
-  renderPass.clearAlpha = 1;
   const bokeh = new BokehPass(scene, camera, { focus: 5, aperture: 0.004, maxblur: 0.012 }); // 2. 景深
   const bloom = new UnrealBloomPass(new Vector2(256, 256), 0.8, 0.6, 0.9);                  // 3. 泛光
   const final = new ShaderPass({                                                           // 4. 調色、暗角、顆粒

@@ -23,6 +23,10 @@ export function createStage(canvas, stageEl, insetEl, reduced) {
   renderer.info.autoReset = false;
 
   const scene = new Scene();
+  // 底色用場景的背景色，不用 renderer 的清除色：背景色不管是直接畫到螢幕、
+  // 還是先畫到後製用的那張圖上，three.js 都會換算成正確的色彩空間。
+  const ink = new Color(INK), ink2 = new Color(INK2);
+  scene.background = ink;
 
   /* ---------- 鷹架：格線與座標軸 ---------- */
   const grid = new GridHelper(12, 12, 0x444a6b, 0x282c44);
@@ -58,7 +62,7 @@ export function createStage(canvas, stageEl, insetEl, reduced) {
   const lights = createLights(scene, renderer);
   const particles = createParticles(scene, renderer);
   const glow = createGlow(scene, star);
-  const post = createPost(renderer, scene, camera, INK);
+  const post = createPost(renderer, scene, camera);
 
   let T = defaults();        // 目標：這一刻場景「應該」是什麼樣子
   const S = defaults();      // 現況：每一幀往目標靠近一點
@@ -125,8 +129,6 @@ export function createStage(canvas, stageEl, insetEl, reduced) {
     renderer.setScissorTest(true);
     renderer.setViewport(0, 0, w, h);
     renderer.setScissor(0, 0, limit ?? w, h);
-    renderer.setClearColor(INK, 1);
-    renderer.clear();
     renderer.render(scene, camera);
     if (limit != null || !S.inset) return;
 
@@ -136,8 +138,7 @@ export function createStage(canvas, stageEl, insetEl, reduced) {
     const x = r.left - s.left, y = s.bottom - r.bottom;
     renderer.setViewport(x, y, r.width, r.height);
     renderer.setScissor(x, y, r.width, r.height);
-    renderer.setClearColor(INK2, 1);
-    renderer.clear();
+    scene.background = ink2;
     if (S.inset === 'path') { observer.position.set(9, 13, 13); observer.lookAt(0, 0, 0); }
     else { observer.position.set(11, 6.5, 14); observer.lookAt(0, 0, 4); }
     observer.aspect = r.width / r.height;
@@ -148,6 +149,7 @@ export function createStage(canvas, stageEl, insetEl, reduced) {
     grid.visible = axes.visible = helper.visible = true;
     pathLine.visible = S.inset === 'path';
     renderer.render(scene, observer);
+    scene.background = ink;
     grid.visible = axes.visible = g;
     helper.visible = pathLine.visible = false;
   }

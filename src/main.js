@@ -11,9 +11,12 @@ import chapter04 from './chapters/04-motion.js';
 import chapter05 from './chapters/05-scroll.js';
 import chapter06 from './chapters/06-particles.js';
 import chapter07 from './chapters/07-shader.js';
+import chapter08 from './chapters/08-post.js';
+import chapter09 from './chapters/09-restraint.js';
+import { EASE, clamp, lerp } from './motion.js';
 
 // 依閱讀順序排列；新章節加在後面
-const CHAPTERS = [chapter01, chapter02, chapter03, chapter04, chapter05, chapter06, chapter07];
+const CHAPTERS = [chapter01, chapter02, chapter03, chapter04, chapter05, chapter06, chapter07, chapter08, chapter09];
 
 const $ = (id) => document.getElementById(id);
 const stageEl = $('stage'), hud = $('hud'), hud2 = $('hud2'), insetEl = $('inset');
@@ -48,7 +51,7 @@ function start() {
     finale: null,     // 「看成品」播放中
   };
 
-  const ctx = { stage, state, refresh, setPaused };
+  const ctx = { stage, state, refresh, setPaused, startFinale };
   const INSET_LABEL = { frustum: '從外面看這台相機', path: '從上面看相機走的路' };
 
   function setPaused(v) {
@@ -89,6 +92,40 @@ function start() {
     $('resume').hidden = !state.paused || idx === 0 || !!state.finale;
     state.dirty = true;
   }
+
+  /* ---------- 看成品：收起文字欄，從頭播一次完整的開場 ---------- */
+  function startFinale() {
+    let t = reduced ? 99 : 0, entered = reduced;
+    const from = { pos: [-3.6, 1.9, 11.5], target: [0, 0, 0] };
+    state.finale = {
+      tick(dt) { t += dt; refresh(); },
+      // 在成品的參數上，依時間改寫：星星出場 → 相機推近並滑到定位 → 標題浮現
+      shape(P) {
+        if (t < 0.6) P.starScale = 0;
+        else if (!entered) { entered = true; stage.star.playEntrance({ ease: 'back', dur: 0.9, over: 0.08 }); }
+        const k = EASE.inOut(clamp((t - 0.4) / 7));
+        P.cam.pos = P.cam.pos.map((v, i) => lerp(from.pos[i], v, k));
+        P.cam.target = P.cam.target.map((v, i) => lerp(from.target[i], v, k));
+        P.cam.damp = t < 0.1 ? 1 : 0.1;
+        P.title = t > 5.6;
+      },
+    };
+    document.body.classList.add('finale');
+    $('exitFinale').hidden = false;
+    if (!reduced) setPaused(false);
+    stage.resize();
+    refresh();
+  }
+  function endFinale() {
+    if (!state.finale) return;
+    state.finale = null;
+    document.body.classList.remove('finale');
+    $('exitFinale').hidden = true;
+    stage.resize();
+    refresh();
+  }
+  $('exitFinale').addEventListener('click', endFinale);
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') endFinale(); });
 
   CHAPTERS.forEach((c) => c.setup(ctx));
 
