@@ -89,3 +89,64 @@ export function wire(root, local, onChange) {
   sync();
   return sync;
 }
+
+// 反向練習：給一段描述，請讀者用旋鈕調出來。
+//   tasks = [{ text, conds: [[(local) => 是否達成, '還差什麼的提示'], ...], answer: { 旋鈕: 值 } }]
+// 回傳 check()：重新判定每一題。
+export function practice(box, tasks, local, onAnswer) {
+  box.innerHTML = tasks.map((t, i) => `
+    <div class="task">
+      <p class="q"><span>${i + 1}</span>${t.text}</p>
+      <p class="st"><em></em><button type="button">看答案</button></p>
+    </div>`).join('');
+  const els = Array.from(box.querySelectorAll('.task'));
+  els.forEach((el, i) => el.querySelector('button').addEventListener('click', () => {
+    Object.assign(local, tasks[i].answer);
+    onAnswer();
+  }));
+  return () => els.forEach((el, i) => {
+    const miss = tasks[i].conds.find(([test]) => !test(local));
+    el.classList.toggle('ok', !miss);
+    el.querySelector('em').textContent = miss ? '還差：' + miss[1] : '✓ 就是這樣';
+  });
+}
+
+// 一章的標準接線：旋鈕、即時描述（data-say）、反向練習（data-practice）、複製鈕（data-copy）。
+//   opts.describe(local) → { 段號: '一句話', all: '整章的描述' }
+//   opts.tasks           → 練習題
+//   opts.after()         → 旋鈕變動後要另外更新的畫面
+export function bindChapter(root, local, ctx, opts = {}) {
+  const says = Array.from(root.querySelectorAll('[data-say]'));
+  let check = null;
+  const update = () => {
+    opts.after?.();
+    if (opts.describe) {
+      const d = opts.describe(local);
+      says.forEach((el) => { el.textContent = d[el.dataset.say] ?? ''; });
+    }
+    check?.();
+  };
+  const sync = wire(root, local, () => { update(); ctx.refresh(); });
+  const box = root.querySelector('[data-practice]');
+  if (box && opts.tasks) check = practice(box, opts.tasks, local, () => { sync(); update(); ctx.refresh(); });
+
+  root.querySelectorAll('button[data-copy]').forEach((b) => b.addEventListener('click', () => {
+    const text = root.querySelector('[data-say="all"]').textContent;
+    navigator.clipboard?.writeText(text).then(() => {
+      b.textContent = '已複製';
+      setTimeout(() => { b.textContent = '複製這段描述'; }, 1500);
+    });
+  }));
+
+  update();
+  return { sync, update };
+}
+
+// 把數值換成詞：pick(0.3, [0.25, '光滑'], [0.6, '半霧面'], '霧面') → '半霧面'
+export function pick(v, ...steps) {
+  for (const s of steps) {
+    if (!Array.isArray(s)) return s;
+    if (v < s[0]) return s[1];
+  }
+  return '';
+}

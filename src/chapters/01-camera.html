@@ -51,6 +51,7 @@ camera.position.z = <b id="codeDist">6.0</b>;</pre>
         <button type="button" data-fov="50" data-dist="6">標準</button>
         <button type="button" data-fov="24" data-dist="12">長焦遠拍</button>
       </div>
+      <p class="say-line"><span data-say="3"></span></p>
     </div>
     <p>按那三顆按鈕比較看看。星星在畫面上差不多一樣大，但感覺完全不同：廣角貼近時格線急速往遠方收，有壓迫感；長焦遠拍時格線幾乎平行，畫面安靜而扁平。</p>
     <p class="lead">這就是為什麼「放大」有兩種做法，而它們不是同一件事。</p>
@@ -76,6 +77,17 @@ camera.position.z = <b id="codeDist">6.0</b>;</pre>
     <p class="lead">之後所有會動的東西，包括捲動運鏡和粒子，都是在這個迴圈裡做的。</p>
   </section>
 
+  <section data-chapter="01" data-step="4.5">
+    <p class="kicker">練習</p>
+    <h2>反過來：照著描述調出來</h2>
+    <p>前面都是你轉旋鈕、我來解釋。現在換過來：下面有兩段描述，請把畫面調成那個樣子。調對了會打勾；卡住的話，下面會提示還差什麼。</p>
+    <div class="panel">
+      <div class="row"><label>視角</label><input type="range" data-k="fov" min="15" max="100" step="1"><output data-o="fov" data-u="°"></output></div>
+      <div class="row"><label>距離</label><input type="range" data-k="dist" min="2.2" max="12" step="0.1"><output data-o="dist"></output></div>
+    </div>
+    <div class="panel" data-practice></div>
+  </section>
+
   <section data-chapter="01" data-step="5">
     <p class="kicker">05　怎麼說</p>
     <h2>這一章給你的詞彙</h2>
@@ -89,6 +101,9 @@ camera.position.z = <b id="codeDist">6.0</b>;</pre>
     <p>所以同一個需求，可以從模糊變成精確：</p>
     <blockquote>✕　「星星大一點、有氣勢一點。」</blockquote>
     <blockquote>○　「相機貼近到距離 3 左右，視角開到 80 度以上，讓星星佔畫面一半，邊緣帶一點廣角變形。」</blockquote>
+    <p>而你在這一章調出來的版本，換成話是這樣：</p>
+    <blockquote class="say"><span data-say="all"></span></blockquote>
+    <div class="btns"><button type="button" data-copy>複製這段描述</button></div>
     <ol class="next" data-toc="1"></ol>
   </section>
 </div>

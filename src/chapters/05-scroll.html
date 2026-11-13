@@ -16,6 +16,7 @@ camera.position.z = lerp(<b data-c="far"></b>, <b data-c="near"></b>, 進度);</
     <div class="panel">
       <div class="row"><label>起點距離</label><input type="range" data-k="far" min="3" max="12" step="0.5"><output data-o="far"></output></div>
       <div class="row"><label>終點距離</label><input type="range" data-k="near" min="2" max="12" step="0.5"><output data-o="near"></output></div>
+      <p class="say-line"><span data-say="1"></span></p>
     </div>
     <p>把「這一段捲了多少」換算成 0 到 1 之間的<strong>進度</strong>，再用進度在兩個數字之間取值（這個動作叫 <strong>lerp</strong>，線性內插）。相機沿著視線前進後退，叫<strong>推軌</strong>。</p>
     <p>捲動不是「觸發」動畫，是「拖曳」動畫。你隨時可以停、可以往回，所以畫面只能由進度決定：同一個進度，永遠是同一個畫面。</p>
@@ -30,6 +31,7 @@ camera.position.z = lerp(<b data-c="far"></b>, <b data-c="near"></b>, 進度);</
     <div class="panel">
       <label class="check"><input type="checkbox" data-k="smoothOn"> 平滑跟隨</label>
       <div class="row"><label>阻尼</label><input type="range" data-k="damp" min="0.01" max="0.5" step="0.01"><output data-o="damp"></output></div>
+      <p class="say-line"><span data-say="2"></span></p>
     </div>
     <pre>const 目標 = lerp(<b data-c="far"></b>, <b data-c="near"></b>, 進度);
 <i>// 每一幀只追上差距的一小部分</i>
@@ -47,6 +49,7 @@ camera.position.z += (目標 - camera.position.z) * <b data-c="damp"></b>;</pre>
       <div class="row"><label>環繞角度</label><input type="range" data-k="a1" min="-270" max="270" step="5"><output data-o="a1" data-u="°"></output></div>
       <div class="row"><label>終點高度</label><input type="range" data-k="h1" min="-3" max="5" step="0.1"><output data-o="h1"></output></div>
       <div class="row"><label>注視點高度</label><input type="range" data-k="look" min="-1.5" max="1.5" step="0.05"><output data-o="look"></output></div>
+      <p class="say-line"><span data-say="3"></span></p>
     </div>
     <pre>const 角度 = lerp(0, <b data-c="a1"></b>, 進度);
 camera.position.set(
@@ -73,6 +76,7 @@ camera.lookAt(0, <b data-c="look"></b>, 0);</pre>
         <button type="button" data-k="cut" data-v="cut">硬切</button>
       </div>
       <div class="row"><label>過渡時長</label><input type="range" data-k="dur" min="0.3" max="4" step="0.1"><output data-o="dur" data-u=" 秒"></output></div>
+      <p class="say-line"><span data-say="4"></span></p>
     </div>
     <pre>const shots = [
   { pos: [0, 0.5, 5.2],      fov: 50 },  <i>// 正面</i>
@@ -96,6 +100,19 @@ moveCameraTo(shots[<b data-c="shot"></b>]);</pre>
     <div class="runway long"><p>進度 <b data-p></b>　繼續往下捲 ↓</p></div>
   </section>
 
+  <section data-chapter="05" data-step="5.5" data-runway>
+    <p class="kicker">練習</p>
+    <h2>反過來：照著描述調出來</h2>
+    <p>兩段描述，各調出一條相機路徑，然後往下捲確認。小視窗裡看得到路徑的形狀。</p>
+    <div class="panel">
+      <div class="row"><label>環繞角度</label><input type="range" data-k="a1" min="-270" max="270" step="5"><output data-o="a1" data-u="°"></output></div>
+      <div class="row"><label>終點高度</label><input type="range" data-k="h1" min="-3" max="5" step="0.1"><output data-o="h1"></output></div>
+      <div class="row"><label>注視點高度</label><input type="range" data-k="look" min="-1.5" max="1.5" step="0.05"><output data-o="look"></output></div>
+    </div>
+    <div class="panel" data-practice></div>
+    <div class="runway"><p>進度 <b data-p></b>　繼續往下捲 ↓</p></div>
+  </section>
+
   <section data-chapter="05" data-step="6">
     <p class="kicker">06　怎麼說</p>
     <h2>這一章給你的詞彙</h2>
@@ -113,6 +130,9 @@ moveCameraTo(shots[<b data-c="shot"></b>]);</pre>
     <p>同一個需求，從模糊到精確：</p>
     <blockquote>✕　「捲下去的時候鏡頭動一下。」</blockquote>
     <blockquote>○　「在這段捲動裡，相機從正面繞到右後方 120 度，同時推近到距離 3、略微升高；跟隨帶一點阻尼，段落之間用過渡，不要硬切。」</blockquote>
+    <p>而你在這一章調出來的版本，換成話是這樣：</p>
+    <blockquote class="say"><span data-say="all"></span></blockquote>
+    <div class="btns"><button type="button" data-copy>複製這段描述</button></div>
     <ol class="next" data-toc="5"></ol>
   </section>
 

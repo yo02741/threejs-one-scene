@@ -1,7 +1,7 @@
 // 第六章：粒子與大量物件
 // 旋鈕：遠裁面、數量、大小、分佈形狀、聚集、亮度落差、混合模式、小星數量與畫法
 import html from './06-particles.html?raw';
-import { wire } from '../ui.js';
+import { bindChapter, pick } from '../ui.js';
 
 const LAST = 5;
 const FINAL = {
@@ -14,6 +14,39 @@ const local = {
 };
 const SHAPES = { box: '方盒', shell: '球殼', band: '傾斜的帶狀' };
 
+function describe(l) {
+  const n = l.count.toLocaleString();
+  const where = `分佈在${SHAPES[l.shape]}裡，${pick(l.cluster, [0.15, '均勻散開'], [0.5, '略有聚集'], '明顯成團')}`;
+  const bright = pick(l.bright, [0.25, '每顆差不多亮'], [0.6, '亮度有些落差'], '多數很暗、少數很亮');
+  const blend = (l.additive ? '加法混合，重疊的地方更亮' : '一般混合') + (l.depthWrite ? '；寫入深度，會出現方形的缺口' : '');
+  const minis = `中景 ${l.minis} 顆小多面體，${l.instanced ? '用 instancing 一次畫完' : '每顆各畫一次'}`;
+  return {
+    1: `${n} 顆點狀的星，${l.atten ? '近大遠小' : '每顆在畫面上一樣大'}。`,
+    2: `${where}；${bright}。`, 3: blend + '。', 4: minis + '。',
+    all: `大約 ${n} 顆點狀的星，${where}；${bright}；${l.additive ? '加法混合' : '一般混合'}。${minis}。`,
+  };
+}
+
+const TASKS = [
+  { text: '稀疏而均勻的夜空：一千顆以下，鋪滿整個球殼，每顆差不多亮，沒有成團。',
+    conds: [
+      [(l) => l.count <= 1000, '星星太多了'],
+      [(l) => l.shape === 'shell', '要鋪滿球殼'],
+      [(l) => l.cluster <= 0.1, '還有成團（聚集調低）'],
+      [(l) => l.bright <= 0.2, '亮度落差太大'],
+    ],
+    answer: { count: 800, shape: 'shell', cluster: 0, bright: 0.1 } },
+  { text: '一條濃密的星帶：一萬顆以上，沿著帶狀分佈，明顯成團，少數幾顆特別亮；中景的小星只留二十顆以內。',
+    conds: [
+      [(l) => l.count >= 10000, '星星不夠多'],
+      [(l) => l.shape === 'band', '要沿著帶狀分佈'],
+      [(l) => l.cluster >= 0.5, '成團不夠明顯'],
+      [(l) => l.bright >= 0.7, '亮度落差再大一點'],
+      [(l) => l.minis <= 20, '中景的小星太多'],
+    ],
+    answer: { count: 14000, shape: 'band', cluster: 0.6, bright: 0.85, minis: 20 } },
+];
+
 export default {
   id: '06',
   html,
@@ -24,9 +57,8 @@ export default {
       root.querySelector('[data-shape]').textContent = SHAPES[local.shape];
       root.querySelector('[data-blend]').textContent = local.additive ? 'AdditiveBlending' : 'NormalBlending';
     };
-    const sync = wire(root, local, () => { names(); ctx.refresh(); });
-    names();
-    root.querySelector('#reseed').addEventListener('click', () => { local.seed++; sync(); ctx.refresh(); });
+    const bound = bindChapter(root, local, ctx, { describe, tasks: TASKS, after: names });
+    root.querySelector('#reseed').addEventListener('click', () => { local.seed++; bound.sync(); ctx.refresh(); });
   },
 
   apply(step, P) {

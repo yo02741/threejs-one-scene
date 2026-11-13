@@ -16,6 +16,7 @@
       <div class="row"><label>數量</label><input type="range" data-k="count" min="100" max="50000" step="100"><output data-o="count"></output></div>
       <div class="row"><label>大小</label><input type="range" data-k="size" min="0.1" max="2" step="0.05"><output data-o="size"></output></div>
       <label class="check"><input type="checkbox" data-k="atten"> 近大遠小</label>
+      <p class="say-line"><span data-say="1"></span></p>
     </div>
     <pre>const stars = new THREE.Points(
   geometry,  <i>// 一個幾何，裡面有 <b data-c="count"></b> 個點</i>
@@ -40,6 +41,7 @@ camera.far = <b data-c="far"></b>;</pre>
       <div class="row"><label>聚集</label><input type="range" data-k="cluster" min="0" max="0.9" step="0.05"><output data-o="cluster"></output></div>
       <div class="row"><label>亮度落差</label><input type="range" data-k="bright" min="0" max="1" step="0.05"><output data-o="bright"></output></div>
       <div class="btns"><button type="button" id="reseed">換一組亂數</button></div>
+      <p class="say-line"><span data-say="2"></span></p>
     </div>
     <pre>const random = seeded(<b data-c="seed"></b>);  <i>// 同一個種子，永遠同一片星空</i>
 for (let i = 0; i &lt; <b data-c="count"></b>; i++) {
@@ -62,6 +64,7 @@ for (let i = 0; i &lt; <b data-c="count"></b>; i++) {
       </div>
       <label class="check"><input type="checkbox" data-k="depthWrite"> 寫入深度</label>
       <div class="row"><label>大小</label><input type="range" data-k="size" min="0.1" max="2" step="0.05"><output data-o="size"></output></div>
+      <p class="say-line"><span data-say="3"></span></p>
     </div>
     <pre>material.blending = THREE.<b data-blend></b>;
 material.depthWrite = <b data-c="depthWrite"></b>;</pre>
@@ -80,6 +83,7 @@ material.depthWrite = <b data-c="depthWrite"></b>;</pre>
         <button type="button" data-k="instanced" data-v="true">一次畫完</button>
       </div>
       <div class="row"><label>小星數量</label><input type="range" data-k="minis" min="10" max="2000" step="10"><output data-o="minis"></output></div>
+      <p class="say-line"><span data-say="4"></span></p>
     </div>
     <pre>const minis = new THREE.InstancedMesh(shape, surface, <b data-c="minis"></b>);
 minis.setMatrixAt(i, 位置與旋轉);  <i>// 每顆只多存一組位置</i></pre>
@@ -95,6 +99,24 @@ minis.setMatrixAt(i, 位置與旋轉);  <i>// 每顆只多存一組位置</i></p
         <p>三者解決的是同一個問題：減少 draw call。</p>
       </div>
     </details>
+  </section>
+
+  <section data-chapter="06" data-step="4.5">
+    <p class="kicker">練習</p>
+    <h2>反過來：照著描述調出來</h2>
+    <p>兩段描述，把畫面調成那個樣子。調對了會打勾；卡住的話，下面會提示還差什麼。</p>
+    <div class="panel">
+      <div class="row"><label>數量</label><input type="range" data-k="count" min="100" max="50000" step="100"><output data-o="count"></output></div>
+      <div class="btns">
+        <button type="button" data-k="shape" data-v="box">方盒</button>
+        <button type="button" data-k="shape" data-v="shell">球殼</button>
+        <button type="button" data-k="shape" data-v="band">傾斜的帶狀</button>
+      </div>
+      <div class="row"><label>聚集</label><input type="range" data-k="cluster" min="0" max="0.9" step="0.05"><output data-o="cluster"></output></div>
+      <div class="row"><label>亮度落差</label><input type="range" data-k="bright" min="0" max="1" step="0.05"><output data-o="bright"></output></div>
+      <div class="row"><label>小星數量</label><input type="range" data-k="minis" min="10" max="2000" step="10"><output data-o="minis"></output></div>
+    </div>
+    <div class="panel" data-practice></div>
   </section>
 
   <section data-chapter="06" data-step="5">
@@ -113,6 +135,9 @@ minis.setMatrixAt(i, 位置與旋轉);  <i>// 每顆只多存一組位置</i></p
     <p>同一個需求，從模糊到精確：</p>
     <blockquote>✕　「背景加一些星星。」</blockquote>
     <blockquote>○　「大約三千顆點狀的星，分佈在一條斜斜橫過畫面的帶上，多數很小、少數比較亮；中景再放幾十顆小多面體慢慢漂。」</blockquote>
+    <p>而你在這一章調出來的版本，換成話是這樣：</p>
+    <blockquote class="say"><span data-say="all"></span></blockquote>
+    <div class="btns"><button type="button" data-copy>複製這段描述</button></div>
     <ol class="next" data-toc="6"></ol>
   </section>
 

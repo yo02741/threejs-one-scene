@@ -19,6 +19,7 @@
       <div class="row"><label>高度</label><input type="range" data-k="el" min="-30" max="85" step="1"><output data-o="el" data-u="°"></output></div>
       <div class="row"><label>強度</label><input type="range" data-k="int" min="0" max="8" step="0.1"><output data-o="int"></output></div>
       <label class="check"><input type="checkbox" data-k="marks"> 顯示光源位置</label>
+      <p class="say-line"><span data-say="1"></span></p>
     </div>
     <pre>const key = new THREE.DirectionalLight(0xffffff, <b data-c="int"></b>);
 key.position.set(...);  <i>// 方位 <b data-c="az"></b>°、高度 <b data-c="el"></b>°</i>
@@ -44,6 +45,7 @@ scene.add(key);</pre>
       <div class="row"><label>補光強度</label><input type="range" data-k="fillInt" min="0" max="4" step="0.05"><output data-o="fillInt"></output></div>
       <label class="check"><input type="checkbox" data-k="rimOn"> 輪廓光</label>
       <div class="row"><label>輪廓光強度</label><input type="range" data-k="rimInt" min="0" max="8" step="0.1"><output data-o="rimInt"></output></div>
+      <p class="say-line"><span data-say="2"></span></p>
     </div>
     <pre>scene.add(key);   <i>// 主光：定出形狀</i>
 scene.add(fill);  <i>// 補光：強度 <b data-c="fillInt"></b>，救回暗面</i>
@@ -62,6 +64,7 @@ scene.add(rim);   <i>// 輪廓光：強度 <b data-c="rimInt"></b>，從背後�
       <div class="row"><label>補光色溫</label><input type="range" data-k="fillTemp" min="-1" max="1" step="0.05"><output data-o="fillTemp"></output></div>
       <div class="row"><label>環境光</label><input type="range" data-k="hemi" min="0" max="1.5" step="0.05"><output data-o="hemi"></output></div>
       <p class="note">色溫：-1 是冷的藍白，0 是白，1 是暖的橘白。</p>
+      <p class="say-line"><span data-say="3"></span></p>
     </div>
     <pre>key.color.set(暖白);    <i>// 色溫 <b data-c="keyTemp"></b></i>
 fill.color.set(冷白);   <i>// 色溫 <b data-c="fillTemp"></b></i>
@@ -94,6 +97,22 @@ key.shadow.mapSize.set(<b data-c="res"></b>, <b data-c="res"></b>);</pre>
     <p class="lead">影子要光、物體、表面三方都同意，而且很貴。需要的時候才開。</p>
   </section>
 
+  <section data-chapter="03" data-step="4.5">
+    <p class="kicker">練習</p>
+    <h2>反過來：照著描述調出來</h2>
+    <p>兩段描述，把畫面調成那個樣子。調對了會打勾；卡住的話，下面會提示還差什麼。</p>
+    <div class="panel">
+      <div class="row"><label>主光方位</label><input type="range" data-k="az" min="-180" max="180" step="1"><output data-o="az" data-u="°"></output></div>
+      <div class="row"><label>主光高度</label><input type="range" data-k="el" min="-30" max="85" step="1"><output data-o="el" data-u="°"></output></div>
+      <div class="row"><label>主光色溫</label><input type="range" data-k="keyTemp" min="-1" max="1" step="0.05"><output data-o="keyTemp"></output></div>
+      <label class="check"><input type="checkbox" data-k="fillOn"> 補光</label>
+      <div class="row"><label>補光強度</label><input type="range" data-k="fillInt" min="0" max="4" step="0.05"><output data-o="fillInt"></output></div>
+      <div class="row"><label>補光色溫</label><input type="range" data-k="fillTemp" min="-1" max="1" step="0.05"><output data-o="fillTemp"></output></div>
+      <label class="check"><input type="checkbox" data-k="rimOn"> 輪廓光</label>
+    </div>
+    <div class="panel" data-practice></div>
+  </section>
+
   <section data-chapter="03" data-step="5">
     <p class="kicker">05　怎麼說</p>
     <h2>這一章給你的詞彙</h2>
@@ -109,6 +128,9 @@ key.shadow.mapSize.set(<b data-c="res"></b>, <b data-c="res"></b>);</pre>
     <p>同一個需求，從模糊到精確：</p>
     <blockquote>✕　「打亮一點、立體一點。」</blockquote>
     <blockquote>○　「主光從左上 45 度打，暖白色；補光只要主光的四分之一、偏冷；背後加一道輪廓光把邊緣勾出來。不需要投影。」</blockquote>
+    <p>而你在這一章調出來的版本，換成話是這樣：</p>
+    <blockquote class="say"><span data-say="all"></span></blockquote>
+    <div class="btns"><button type="button" data-copy>複製這段描述</button></div>
     <ol class="next" data-toc="3"></ol>
   </section>
 

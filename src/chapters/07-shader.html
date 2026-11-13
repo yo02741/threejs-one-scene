@@ -39,6 +39,7 @@
     <div class="panel">
       <div class="row"><label>銳利度</label><input type="range" data-k="pow" min="0.5" max="6" step="0.1"><output data-o="pow"></output></div>
       <div class="row"><label>強度</label><input type="range" data-k="int" min="0" max="1.5" step="0.05"><output data-o="int"></output></div>
+      <p class="say-line"><span data-say="2"></span></p>
     </div>
     <pre>float 正對程度 = dot(法線, 視線);     <i>// 正對著你是 1，側對著你是 0</i>
 float f = pow(1.0 - 正對程度, <b data-c="pow"></b>);
@@ -56,6 +57,7 @@ gl_FragColor = vec4(color, f * <b data-c="int"></b>);</pre>
       <div class="row"><label>速度</label><input type="range" data-k="nSpeed" min="0" max="2" step="0.05"><output data-o="nSpeed"></output></div>
       <div class="row"><label>影響強度</label><input type="range" data-k="nAmt" min="0" max="1" step="0.05"><output data-o="nAmt"></output></div>
       <label class="check"><input type="checkbox" data-k="freeze"> 凍結時間</label>
+      <p class="say-line"><span data-say="3"></span></p>
     </div>
     <pre>uniform float uTime;  <i>// 每一幀從 JS 送進來</i>
 
@@ -74,6 +76,7 @@ float n = noise(位置 * <b data-c="nScale"></b> + uTime * <b data-c="nSpeed"></
       <div class="row"><label>位移</label><input type="range" data-k="disp" min="0" max="0.5" step="0.01"><output data-o="disp"></output></div>
       <div class="row"><label>位移頻率</label><input type="range" data-k="dispFreq" min="0.5" max="6" step="0.1"><output data-o="dispFreq"></output></div>
       <div class="row"><label>背景星閃爍</label><input type="range" data-k="twinkle" min="0" max="1" step="0.05"><output data-o="twinkle"></output></div>
+      <p class="say-line"><span data-say="4"></span></p>
     </div>
     <pre><i>// 頂點著色器：每個頂點跑一次，在畫之前決定它的位置</i>
 position += normal * noise(position * <b data-c="dispFreq"></b>) * <b data-c="disp"></b>;</pre>
@@ -89,6 +92,20 @@ position += normal * noise(position * <b data-c="dispFreq"></b>) * <b data-c="di
         <p>概念完全相同：片段、頂點、uniform、噪聲、菲涅耳，一個都沒變，只是語法不同。這本書用 GLSL，因為現有的教學和範例絕大多數還是它。</p>
       </div>
     </details>
+  </section>
+
+  <section data-chapter="07" data-step="4.5">
+    <p class="kicker">練習</p>
+    <h2>反過來：照著描述調出來</h2>
+    <p>兩段描述，把畫面調成那個樣子。調對了會打勾；卡住的話，下面會提示還差什麼。</p>
+    <div class="panel">
+      <div class="row"><label>銳利度</label><input type="range" data-k="pow" min="0.5" max="6" step="0.1"><output data-o="pow"></output></div>
+      <div class="row"><label>強度</label><input type="range" data-k="int" min="0" max="1.5" step="0.05"><output data-o="int"></output></div>
+      <div class="row"><label>噪聲速度</label><input type="range" data-k="nSpeed" min="0" max="2" step="0.05"><output data-o="nSpeed"></output></div>
+      <div class="row"><label>噪聲影響</label><input type="range" data-k="nAmt" min="0" max="1" step="0.05"><output data-o="nAmt"></output></div>
+      <div class="row"><label>位移</label><input type="range" data-k="disp" min="0" max="0.5" step="0.01"><output data-o="disp"></output></div>
+    </div>
+    <div class="panel" data-practice></div>
   </section>
 
   <section data-chapter="07" data-step="5">
@@ -107,6 +124,9 @@ position += normal * noise(position * <b data-c="dispFreq"></b>) * <b data-c="di
     <p>同一個需求，從模糊到精確：</p>
     <blockquote>✕　「星星要有發光的感覺。」</blockquote>
     <blockquote>○　「外面包一層菲涅耳光暈：邊緣亮、中心透明，暖白色；用低頻噪聲讓它慢慢流動，強度不要超過 0.6。」</blockquote>
+    <p>而你在這一章調出來的版本，換成話是這樣：</p>
+    <blockquote class="say"><span data-say="all"></span></blockquote>
+    <div class="btns"><button type="button" data-copy>複製這段描述</button></div>
     <ol class="next" data-toc="7"></ol>
   </section>
 

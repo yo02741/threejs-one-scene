@@ -229,3 +229,21 @@ section[data-runway] { justify-content: flex-start; }
 body.finale main, body.finale #nav, body.finale #hud, body.finale #hud2, body.finale #graph { display: none; }
 body.finale #stage { left: 0; height: 100%; bottom: 0; border: 0; }
 @media (prefers-reduced-motion: reduce) { #title { transition: none; } }
+
+/* ---------- 即時描述與反向練習 ---------- */
+.say-line {
+  margin: 4px 0 6px; padding-top: 10px; border-top: 1px dashed var(--line);
+  font-size: 14px; line-height: 1.7; color: var(--text);
+}
+.say-line::before { content: "用話說　"; color: var(--sage); font-size: 12px; letter-spacing: .1em; }
+blockquote.say { border-left-color: var(--star); }
+.task { padding: 12px 0 4px; border-top: 1px solid var(--line); }
+.task:first-child { border-top: 0; padding-top: 0; }
+.task .q { margin: 0 0 6px; font-size: 15px; display: flex; gap: 12px; }
+.task .q span { flex: 0 0 auto; color: #5f6279; font-family: ui-monospace, monospace; }
+.task .st { margin: 0 0 8px; padding-left: 22px; font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 12px; }
+.task .st em { font-style: normal; flex: 1; }
+.task .st button { font-size: 12px; padding: 2px 10px; }
+.task.ok .st em { color: var(--sage); }
+.task.ok .q { color: var(--muted); }
+.task.ok .st button { display: none; }

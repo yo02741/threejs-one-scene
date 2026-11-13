@@ -16,6 +16,7 @@
     <div class="panel">
       <div class="row"><label>細分</label><input type="range" data-k="detail" min="0" max="5" step="1"><output data-o="detail"></output></div>
       <label class="check"><input type="checkbox" data-k="wire"> 顯示線框</label>
+      <p class="say-line"><span data-say="1"></span></p>
     </div>
     <p>3D 裡的每個形狀都是三角形拼出來的。三角形的數量叫<strong>面數</strong>：越多越接近圓，也越花力氣畫。把<strong>線框</strong>（只畫三角形的邊）關掉再拉一次，你會發現自己其實分不太出 500 和 720。</p>
     <p class="lead">面數是細緻和效能之間的第一個取捨。之後覺得「不夠圓」的時候，先問：需要多圓？</p>
@@ -51,6 +52,7 @@
       </div>
       <div class="row"><label>粗糙度</label><input type="range" data-k="rough" min="0" max="1" step="0.01"><output data-o="rough"></output></div>
       <div class="row"><label>金屬感</label><input type="range" data-k="metal" min="0" max="1" step="0.01"><output data-o="metal"></output></div>
+      <p class="say-line"><span data-say="3"></span></p>
     </div>
     <pre>surface.roughness = <b data-c="rough"></b>;
 surface.metalness = <b data-c="metal"></b>;</pre>
@@ -66,11 +68,25 @@ surface.metalness = <b data-c="metal"></b>;</pre>
       <label class="check"><input type="checkbox" data-k="flat"> 平面著色</label>
       <label class="check"><input type="checkbox" data-k="normals"> 顯示法線</label>
       <div class="row"><label>細分</label><input type="range" data-k="detail" min="0" max="5" step="1"><output data-o="detail"></output></div>
+      <p class="say-line"><span data-say="4"></span></p>
     </div>
     <pre>surface.flatShading = <b data-c="flat"></b>;</pre>
     <p>那些淺色的小箭頭叫<strong>法線</strong>，代表表面「朝向哪裡」，光影就是照它算的。<strong>平面著色</strong>時每個面只有一個朝向，面和面之間有明確的折線。<strong>平滑著色</strong>時朝向記在頂點上，在面的內部慢慢過渡，光影就連成一片。</p>
     <p>所以「看起來圓滑」和「面數多」不是同一件事。把細分調到 1、關掉平面著色：只有 80 個面，看起來卻比 320 個面的平面著色還圓。</p>
     <p class="lead">不過輪廓騙不了人。看星星的邊緣，它還是多邊形。</p>
+  </section>
+
+  <section data-chapter="02" data-step="4.5">
+    <p class="kicker">練習</p>
+    <h2>反過來：照著描述調出來</h2>
+    <p>兩段描述，把畫面調成那個樣子。調對了會打勾；卡住的話，下面會提示還差什麼。</p>
+    <div class="panel">
+      <div class="row"><label>細分</label><input type="range" data-k="detail" min="0" max="5" step="1"><output data-o="detail"></output></div>
+      <label class="check"><input type="checkbox" data-k="flat"> 平面著色</label>
+      <div class="row"><label>粗糙度</label><input type="range" data-k="rough" min="0" max="1" step="0.01"><output data-o="rough"></output></div>
+      <div class="row"><label>金屬感</label><input type="range" data-k="metal" min="0" max="1" step="0.01"><output data-o="metal"></output></div>
+    </div>
+    <div class="panel" data-practice></div>
   </section>
 
   <section data-chapter="02" data-step="5">
@@ -88,6 +104,9 @@ surface.metalness = <b data-c="metal"></b>;</pre>
     <p>同一個需求，從模糊到精確：</p>
     <blockquote>✕　「星星要有質感一點。」</blockquote>
     <blockquote>○　「低面數、保留稜角，表面是不反光的霧面，粗糙度 0.4 到 0.5，不要金屬感，本身帶一點暖色的微光。」</blockquote>
+    <p>而你在這一章調出來的版本，換成話是這樣：</p>
+    <blockquote class="say"><span data-say="all"></span></blockquote>
+    <div class="btns"><button type="button" data-copy>複製這段描述</button></div>
     <ol class="next" data-toc="2"></ol>
   </section>
 

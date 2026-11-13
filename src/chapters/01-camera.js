@@ -10,6 +10,25 @@
 //                      還沒讀到的章節不會被呼叫。回傳的字串顯示在左上角 HUD。
 //   frame(ctx)         （可省略）這章作用中時，每一幀呼叫一次
 import html from './01-camera.html?raw';
+import { bindChapter, pick } from '../ui.js';
+
+function describe(l) {
+  const lens = pick(l.fov, [30, '長焦'], [65, '標準視角'], '廣角');
+  const where = pick(l.dist, [3.5, '貼近主角'], [8, '在中距離'], '退得很遠');
+  const feel = l.fov >= 75 && l.dist <= 4 ? '透視感強烈，邊緣帶廣角變形'
+    : l.fov <= 30 && l.dist >= 8 ? '透視被壓平，畫面安靜' : '透視自然';
+  const line = `${lens}（視角 ${l.fov} 度），相機${where}（距離 ${l.dist.toFixed(1)}）：${feel}。`;
+  return { 3: line, all: line };
+}
+
+const TASKS = [
+  { text: '廣角貼近：星星佔掉大半個畫面，地上的格線急速往遠方收。',
+    conds: [[(l) => l.fov >= 80, '視角再開大一點（廣角）'], [(l) => l.dist <= 3.2, '相機再靠近一點']],
+    answer: { fov: 95, dist: 2.6 } },
+  { text: '長焦遠拍：星星在畫面上不算小，但格線幾乎平行，整個畫面是扁的。',
+    conds: [[(l) => l.fov <= 28, '視角再收窄一點（長焦）'], [(l) => l.dist >= 10, '相機再退遠一點']],
+    answer: { fov: 24, dist: 12 } },
+];
 
 const HUD = [
   'scene: 空',
@@ -30,15 +49,17 @@ export default {
 
   setup(ctx) {
     const { state } = ctx;
-    const showCamera = () => {
+    // 第 1 章原本的滑桿用 id 手動接線；練習段的滑桿與即時描述走共用的 bindChapter
+    const paint = () => {
       $('codeFov').textContent = local.fov;
       $('codeDist').textContent = local.dist.toFixed(1);
       $('fovOut').textContent = local.fov + '°';
       $('distOut').textContent = local.dist.toFixed(1);
       $('fov').value = local.fov;
       $('dist').value = local.dist;
-      ctx.refresh();
     };
+    const bound = bindChapter($('ch1'), local, ctx, { describe, tasks: TASKS, after: paint });
+    const showCamera = () => { bound.sync(); bound.update(); ctx.refresh(); };
 
     $('gridToggle').addEventListener('change', (e) => { local.showGrid = e.target.checked; ctx.refresh(); });
     $('fov').addEventListener('input', (e) => { local.fov = +e.target.value; showCamera(); });
@@ -66,7 +87,7 @@ export default {
   },
 
   apply(step, P) {
-    P.scaffold = step >= 1 && step <= 4 && local.showGrid;
+    P.scaffold = step >= 1 && step < LAST && local.showGrid;
     P.inset = step === 3 || step === 4 ? 'frustum' : null;
     P.starScale = step >= 2 ? 1 : 0;
 
@@ -77,8 +98,7 @@ export default {
     P.cam.damp = step >= 1 && step < LAST ? 1 : 0.12;
 
     if (step === Infinity) return null;
-    return (step >= 1 && step <= 4 && !local.showGrid)
-      ? HUD[step].replace('格線 + 座標軸', '（鷹架已隱藏）')
-      : HUD[step];
+    const text = HUD[Math.floor(step)];
+    return (step >= 1 && step < LAST && !local.showGrid) ? text.replace('格線 + 座標軸', '（鷹架已隱藏）') : text;
   },
 };

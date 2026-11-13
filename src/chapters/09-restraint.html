@@ -21,6 +21,7 @@
       <p class="note">像素比。你的螢幕是 <span id="dpr"></span>；高於這個數字的選項不會有差別。</p>
       <div class="row"><label>粒子倍率</label><input type="range" data-k="mul" min="0.1" max="8" step="0.1"><output data-o="mul" data-u="×"></output></div>
       <label class="check"><input type="checkbox" data-k="postOn"> 後製</label>
+      <p class="say-line"><span data-say="1"></span></p>
     </div>
     <pre>renderer.setPixelRatio(Math.min(window.devicePixelRatio, <b data-c="pr"></b>));</pre>
     <p>每秒 60 張，等於每一張只有 16.6 毫秒。超過了，畫面就會掉格。這個時間叫<strong>幀率預算</strong>，場景裡的每一樣東西都在花它。</p>
@@ -47,6 +48,7 @@
         <button type="button" data-set='{"bloom":true,"dof":true,"grain":true,"vig":true,"flow":true,"disp":true,"minis":true,"float":true}'>全開</button>
         <button type="button" data-set='{"bloom":true,"dof":false,"grain":false,"vig":true,"flow":true,"disp":false,"minis":true,"float":true}'>我的版本</button>
       </div>
+      <p class="say-line"><span data-say="2"></span></p>
     </div>
     <p>你會發現有幾樣關掉之後幾乎看不出差別，卻省下不少毫秒（景深是最明顯的一個：它讓場景多畫一遍）。也有幾樣一關掉，畫面就死了（漂浮通常是）。</p>
     <p>「我的版本」是這本書最後留下來的組合，不是標準答案。</p>
@@ -61,6 +63,7 @@
       <label class="check"><input type="checkbox" data-k="title"> 標題字</label>
       <div class="row"><label>主星位置</label><input type="range" data-k="heroX" min="0" max="1" step="0.01"><output data-o="heroX"></output></div>
       <div class="row"><label>背景星密度</label><input type="range" data-k="density" min="0.1" max="2" step="0.05"><output data-o="density" data-u="×"></output></div>
+      <p class="say-line"><span data-say="3"></span></p>
     </div>
     <pre>camera.lookAt(<b data-c="heroX"></b> * 偏移量, 0, 0);  <i>// 相機看向星星的右邊，星星就落在畫面左邊</i></pre>
     <p>這個場景最後是一個網站的開場，不是一件展示品。它上面會有標題、有按鈕、有人要讀的字。星星在正中央時，字沒有地方放；移到左邊三分之一，右邊就空出來了。那塊空叫<strong>留白</strong>，它是畫面的一部分。</p>
@@ -87,6 +90,18 @@ if (!WebGL)   { 顯示一張靜態的備援畫面; }</pre>
     <p class="lead">開場卡住或壞掉的時候，使用者看到的不是「3D 效果沒出來」，是「這個網站壞了」。</p>
   </section>
 
+  <section data-chapter="09" data-step="4.5">
+    <p class="kicker">練習</p>
+    <h2>反過來：照著描述調出來</h2>
+    <p>兩段描述，把畫面調成那個樣子。調對了會打勾；卡住的話，下面會提示還差什麼。</p>
+    <div class="panel">
+      <label class="check"><input type="checkbox" data-k="title"> 標題字</label>
+      <div class="row"><label>主星位置</label><input type="range" data-k="heroX" min="0" max="1" step="0.01"><output data-o="heroX"></output></div>
+      <div class="row"><label>背景星密度</label><input type="range" data-k="density" min="0.1" max="2" step="0.05"><output data-o="density" data-u="×"></output></div>
+    </div>
+    <div class="panel" data-practice></div>
+  </section>
+
   <section data-chapter="09" data-step="5">
     <p class="kicker">05　怎麼說</p>
     <h2>這一章給你的詞彙</h2>
@@ -102,6 +117,9 @@ if (!WebGL)   { 顯示一張靜態的備援畫面; }</pre>
     <p>同一個需求，從模糊到精確：</p>
     <blockquote>✕　「再酷一點。」</blockquote>
     <blockquote>○　「拿掉景深和顆粒，泛光只留主星。主星放在左邊三分之一，右邊留給標題。手機上像素比鎖 1.5、粒子減半；減少動態時停在一張靜態畫面。」</blockquote>
+    <p>而你在這一章調出來的版本，換成話是這樣：</p>
+    <blockquote class="say"><span data-say="all"></span></blockquote>
+    <div class="btns"><button type="button" data-copy>複製這段描述</button></div>
     <p>九章到這裡結束。你從一塊黑色開始，現在可以用精確的話描述這個畫面的每一個部分。把它從頭播一次。</p>
     <div class="panel"><div class="btns"><button type="button" id="watch">看成品</button></div></div>
     <ol class="next" data-toc="9"></ol>

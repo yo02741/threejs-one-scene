@@ -34,6 +34,7 @@ composer.addPass(new OutputPass());               <i>// 3. 送上螢幕</i></pre
       <div class="row"><label>強度</label><input type="range" data-k="str" min="0" max="3" step="0.05"><output data-o="str"></output></div>
       <div class="row"><label>半徑</label><input type="range" data-k="rad" min="0" max="1" step="0.01"><output data-o="rad"></output></div>
       <label class="check"><input type="checkbox" data-k="tone"> 色調映射</label>
+      <p class="say-line"><span data-say="2"></span></p>
     </div>
     <pre>composer.addPass(new UnrealBloomPass(尺寸, <b data-c="str"></b>, <b data-c="rad"></b>, <b data-c="thr"></b>));
 star.material.emissiveIntensity = <b data-c="emissive"></b>;</pre>
@@ -53,6 +54,7 @@ star.material.emissiveIntensity = <b data-c="emissive"></b>;</pre>
       <div class="row"><label>光圈</label><input type="range" data-k="aperture" min="0" max="10" step="0.1"><output data-o="aperture"></output></div>
       <div class="row"><label>顆粒</label><input type="range" data-k="grain" min="0" max="1" step="0.02"><output data-o="grain"></output></div>
       <div class="row"><label>暗角</label><input type="range" data-k="vig" min="0" max="1" step="0.02"><output data-o="vig"></output></div>
+      <p class="say-line"><span data-say="3"></span></p>
     </div>
     <pre>composer.addPass(new BokehPass(scene, camera, { focus: <b data-c="focus"></b>, aperture: <b data-c="aperture"></b> }));
 <i>// 顆粒 <b data-c="grain"></b>、暗角 <b data-c="vig"></b>：寫在最後一關的 shader 裡</i></pre>
@@ -76,6 +78,7 @@ star.material.emissiveIntensity = <b data-c="emissive"></b>;</pre>
       <div class="row"><label>飽和度</label><input type="range" data-k="sat" min="0" max="2" step="0.01"><output data-o="sat"></output></div>
       <div class="row"><label>暗部偏藍</label><input type="range" data-k="cool" min="0" max="1" step="0.02"><output data-o="cool"></output></div>
       <div class="row"><label>亮部偏暖</label><input type="range" data-k="warm" min="0" max="1" step="0.02"><output data-o="warm"></output></div>
+      <p class="say-line"><span data-say="4"></span></p>
     </div>
     <pre>color *= <b data-c="exposure"></b>;                              <i>// 曝光</i>
 color = mix(灰階(color), color, <b data-c="sat"></b>);          <i>// 飽和度</i>
@@ -91,6 +94,22 @@ color = (color - 0.18) * <b data-c="contrast"></b> + 0.18;       <i>// 對比</i
         <p>兩邊的概念完全通用：都是「先拍下來，再一關一關加工」，泛光、景深、調色的旋鈕也是同一批名字。</p>
       </div>
     </details>
+  </section>
+
+  <section data-chapter="08" data-step="4.5">
+    <p class="kicker">練習</p>
+    <h2>反過來：照著描述調出來</h2>
+    <p>兩段描述，把畫面調成那個樣子。調對了會打勾；卡住的話，下面會提示還差什麼。</p>
+    <div class="panel">
+      <label class="check"><input type="checkbox" data-k="bloom"> 泛光</label>
+      <div class="row"><label>閾值</label><input type="range" data-k="thr" min="0" max="1.5" step="0.01"><output data-o="thr"></output></div>
+      <div class="row"><label>半徑</label><input type="range" data-k="rad" min="0" max="1" step="0.01"><output data-o="rad"></output></div>
+      <div class="row"><label>顆粒</label><input type="range" data-k="grain" min="0" max="1" step="0.02"><output data-o="grain"></output></div>
+      <div class="row"><label>暗角</label><input type="range" data-k="vig" min="0" max="1" step="0.02"><output data-o="vig"></output></div>
+      <div class="row"><label>飽和度</label><input type="range" data-k="sat" min="0" max="2" step="0.01"><output data-o="sat"></output></div>
+      <div class="row"><label>亮部偏暖</label><input type="range" data-k="warm" min="0" max="1" step="0.02"><output data-o="warm"></output></div>
+    </div>
+    <div class="panel" data-practice></div>
   </section>
 
   <section data-chapter="08" data-step="5">
@@ -109,6 +128,9 @@ color = (color - 0.18) * <b data-c="contrast"></b> + 0.18;       <i>// 對比</i
     <p>同一個需求，從模糊到精確：</p>
     <blockquote>✕　「要有電影感。」</blockquote>
     <blockquote>○　「只讓主星泛光：閾值高、半徑大、強度中等。加很淡的顆粒和暗角，暗部偏藍、亮部偏暖。不要景深。」</blockquote>
+    <p>而你在這一章調出來的版本，換成話是這樣：</p>
+    <blockquote class="say"><span data-say="all"></span></blockquote>
+    <div class="btns"><button type="button" data-copy>複製這段描述</button></div>
     <ol class="next" data-toc="8"></ol>
   </section>
 

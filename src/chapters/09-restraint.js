@@ -1,7 +1,7 @@
 // 第九章：克制與效能
 // 旋鈕：像素比、粒子倍率、後製開關、八個效果的開關、主星位置、密度、標題字、三種模擬情境
 import html from './09-restraint.html?raw';
-import { wire } from '../ui.js';
+import { bindChapter, pick } from '../ui.js';
 
 const LAST = 5;
 const local = {
@@ -27,13 +27,33 @@ function excess(P, t) {
   P.pts.count = 6000;
 }
 
+const EFFECTS = { bloom: '泛光', dof: '景深', grain: '顆粒', vig: '暗角', flow: '光暈流動', disp: '輪廓位移', minis: '中景小星', float: '漂浮與閃爍' };
+
+function describe(l) {
+  const off = Object.keys(EFFECTS).filter((k) => !l[k]).map((k) => EFFECTS[k]);
+  const on = Object.keys(EFFECTS).filter((k) => l[k]).map((k) => EFFECTS[k]);
+  const cut = off.length === 0 ? '什麼都沒拿掉' : on.length === 0 ? '全部拿掉了' : `拿掉${off.join('、')}，留下${on.join('、')}`;
+  const budget = `像素比上限 ${l.pr >= 4 ? '不設（裝置原生）' : l.pr}，粒子 ${l.mul.toFixed(1)} 倍，${l.postOn ? '有' : '沒有'}後製`;
+  const layout = `主星${pick(l.heroX, [0.2, '置中'], [0.75, '略偏左'], '放在左邊三分之一，右邊留白')}；背景星密度 ${l.density.toFixed(2)} 倍${l.title ? '；右側放標題' : ''}`;
+  return { 1: budget + '。', 2: cut + '。', 3: layout + '。', all: `${cut}。${layout}。${budget}。` };
+}
+
+const TASKS = [
+  { text: '標準的開場構圖：主星在左邊三分之一，右邊放標題，背景星不搶戲（密度不超過一倍）。',
+    conds: [[(l) => l.heroX >= 0.85, '主星再往左移'], [(l) => l.title, '把標題字打開'], [(l) => l.density <= 1, '背景星太密，字會難讀']],
+    answer: { heroX: 1, title: true, density: 0.7 } },
+  { text: '置中的海報：主星在正中央，不放標題，背景星加到一倍半以上。',
+    conds: [[(l) => l.heroX <= 0.1, '主星要回到正中央'], [(l) => !l.title, '把標題字關掉'], [(l) => l.density >= 1.5, '背景星再密一點']],
+    answer: { heroX: 0, title: false, density: 1.8 } },
+];
+
 export default {
   id: '09',
   html,
 
   setup(ctx) {
     const root = document.getElementById('ch9');
-    wire(root, local, ctx.refresh);
+    bindChapter(root, local, ctx, { describe, tasks: TASKS });
     root.querySelector('#dpr').textContent = (window.devicePixelRatio || 1).toFixed(2).replace(/\.?0+$/, '');
     root.querySelector('#watch').addEventListener('click', () => ctx.startFinale());
   },
@@ -57,7 +77,7 @@ export default {
     const done = step >= LAST;
     const heroX = done ? 1 : local.heroX;
     P.mul = done ? 0.7 : local.density;
-    P.title = step === 3 && local.title;
+    P.title = (step === 3 || step === 4.5) && local.title;
 
     // 讓星星落在畫面左邊三分之一：相機和注視點一起往右移
     const shift = heroX * (6.2 * 0.466 * ctx.stage.camera.aspect) / 3 * 1.15;
@@ -70,6 +90,6 @@ export default {
       if (local.sim === 'nogl') P.fallback = true;
       return { none: 'scene: 成品', low: 'scene: 成品（低階裝置：像素比 1、粒子減半、沒有後製）', reduced: 'scene: 成品（減少動態：停在這一張）', nogl: '（沒有 WebGL）' }[local.sim];
     }
-    return step === 3 ? 'scene: 克制的版本' : 'scene: 成品';
+    return step < LAST ? 'scene: 克制的版本' : 'scene: 成品';
   },
 };

@@ -21,6 +21,7 @@
       </div>
       <div class="row"><label>時長</label><input type="range" data-k="dur" min="0.2" max="3" step="0.1"><output data-o="dur" data-u=" 秒"></output></div>
       <div class="btns"><button type="button" id="replay">重播出場</button></div>
+      <p class="say-line"><span data-say="1"></span></p>
     </div>
     <pre>const t = 經過的時間 / <b data-c="dur"></b>;   <i>// 0 → 1</i>
 const k = <b data-ease></b>(t);         <i>// 曲線在這一行</i>
@@ -43,6 +44,7 @@ star.scale.setScalar(k);</pre>
       </div>
       <div class="row"><label>剛性</label><input type="range" data-k="stiff" min="20" max="600" step="10"><output data-o="stiff"></output></div>
       <div class="row"><label>阻尼</label><input type="range" data-k="dampS" min="1" max="40" step="1"><output data-o="dampS"></output></div>
+      <p class="say-line"><span data-say="2"></span></p>
     </div>
     <pre>速度 += (-<b data-c="stiff"></b> * 位移 - <b data-c="dampS"></b> * 速度) * dt;
 位移 += 速度 * dt;
@@ -70,11 +72,31 @@ star.scale.setScalar(1 + 位移);</pre>
       <div class="row"><label>呼吸幅度</label><input type="range" data-k="breath" min="0" max="0.2" step="0.005"><output data-o="breath"></output></div>
       <div class="row"><label>自轉速度</label><input type="range" data-k="spin" min="0" max="2" step="0.05"><output data-o="spin"></output></div>
       <label class="check"><input type="checkbox" data-k="sync"> 漂浮和呼吸用同一個節拍</label>
+      <p class="say-line"><span data-say="3"></span></p>
     </div>
     <pre>star.position.y = <b data-c="floatAmp"></b> * Math.sin(時間 * 2π / <b data-c="period"></b>);</pre>
     <p>一個來回花的時間叫<strong>週期</strong>，來回的距離叫<strong>幅度</strong>。漂浮、呼吸（微微放大縮小）、自轉，是三個各自循環的動作。</p>
     <p>勾選「同一個節拍」，星星會像節拍器一樣規律。取消勾選，三個動作的週期<strong>錯開</strong>，組合起來很久才重複一次，看起來就像活的。</p>
     <p class="lead">好的待機動作幾乎看不見。拿掉它，畫面卻馬上變死。</p>
+  </section>
+
+  <section data-chapter="04" data-step="3.5">
+    <p class="kicker">練習</p>
+    <h2>反過來：照著描述調出來</h2>
+    <p>兩段描述，把畫面調成那個樣子。調對了會打勾；卡住的話，下面會提示還差什麼。</p>
+    <div class="panel">
+      <div class="btns">
+        <button type="button" data-k="mode" data-v="spring">彈簧</button>
+        <button type="button" data-k="mode" data-v="tween">緩動</button>
+      </div>
+      <div class="btns"><button type="button" id="poke2">戳一下</button></div>
+      <div class="row"><label>剛性</label><input type="range" data-k="stiff" min="20" max="600" step="10"><output data-o="stiff"></output></div>
+      <div class="row"><label>阻尼</label><input type="range" data-k="dampS" min="1" max="40" step="1"><output data-o="dampS"></output></div>
+      <div class="row"><label>漂浮幅度</label><input type="range" data-k="floatAmp" min="0" max="0.6" step="0.01"><output data-o="floatAmp"></output></div>
+      <div class="row"><label>漂浮週期</label><input type="range" data-k="period" min="1" max="12" step="0.5"><output data-o="period" data-u=" 秒"></output></div>
+      <label class="check"><input type="checkbox" data-k="sync"> 漂浮和呼吸用同一個節拍</label>
+    </div>
+    <div class="panel" data-practice></div>
   </section>
 
   <section data-chapter="04" data-step="4">
@@ -93,6 +115,9 @@ star.scale.setScalar(1 + 位移);</pre>
     <p>同一個需求，從模糊到精確：</p>
     <blockquote>✕　「動得自然一點。」</blockquote>
     <blockquote>○　「出場 0.9 秒，緩出，尾巴帶一點點過衝；之後 7 秒一個循環上下漂浮，幅度很小，幾乎察覺不到。」</blockquote>
+    <p>而你在這一章調出來的版本，換成話是這樣：</p>
+    <blockquote class="say"><span data-say="all"></span></blockquote>
+    <div class="btns"><button type="button" data-copy>複製這段描述</button></div>
     <ol class="next" data-toc="4"></ol>
   </section>
 
