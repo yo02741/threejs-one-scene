@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ひとめぐり 星空教本 · 第一章</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500&family=Noto+Serif+TC:wght@500;700&family=Shippori+Mincho:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #12141f;
+    --ink-2: #1b1e2e;
+    --line: #2c3048;
+    --text: #d9d6cc;
+    --muted: #8d8fa3;
+    --star: #ecdcae;
+    --sage: #9fb8ad;
+    --col: 460px;
+    --stage-h: 42vh;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--ink);
+    color: var(--text);
+    font-family: "Noto Sans TC", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.85;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- stage ---------- */
+  #stage {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--stage-h);
+    background: var(--ink);
+    border-bottom: 1px solid var(--line);
+    z-index: 2;
+  }
+  #c { display: block; width: 100%; height: 100%; }
+  #hud {
+    position: absolute; top: 14px; left: 16px;
+    font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color: var(--muted);
+    letter-spacing: .02em;
+  }
+  #inset {
+    position: absolute; right: 12px; bottom: 12px;
+    width: 40%; max-width: 340px; aspect-ratio: 4 / 3;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    pointer-events: none;
+    opacity: 0; transition: opacity .4s;
+  }
+  #inset.on { opacity: 1; }
+  #inset span {
+    position: absolute; top: 6px; left: 9px;
+    font-size: 11px; color: var(--muted); letter-spacing: .08em;
+  }
+
+  /* ---------- text column ---------- */
+  main { padding-top: var(--stage-h); }
+  section {
+    min-height: 72vh;
+    padding: 56px 22px;
+    display: flex; flex-direction: column; justify-content: center;
+    opacity: .38; transition: opacity .45s;
+  }
+  section.active { opacity: 1; }
+  .kicker {
+    font-size: 12px; letter-spacing: .22em; color: var(--sage);
+    margin: 0 0 14px;
+  }
+  h1, h2 {
+    font-family: "Noto Serif TC", serif;
+    font-weight: 700; line-height: 1.35; margin: 0 0 18px;
+    color: #efece2;
+  }
+  h1 { font-size: 34px; }
+  h2 { font-size: 26px; }
+  .brand { font-family: "Shippori Mincho", "Noto Serif TC", serif; font-weight: 500; letter-spacing: .12em; }
+  p { margin: 0 0 16px; }
+  .lead { color: var(--muted); }
+  strong { color: var(--star); font-weight: 500; }
+
+  pre {
+    margin: 6px 0 20px; padding: 14px 16px;
+    background: var(--ink-2); border: 1px solid var(--line); border-radius: 6px;
+    font: 13px/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color: #b9bccb; overflow-x: auto; white-space: pre;
+  }
+  pre b { color: var(--star); font-weight: 400; }
+  pre i { color: #6d7089; font-style: normal; }
+
+  .panel {
+    margin: 4px 0 20px; padding: 16px 16px 10px;
+    border: 1px solid var(--line); border-radius: 6px;
+  }
+  .row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .row label { flex: 0 0 5.2em; font-size: 14px; color: var(--muted); }
+  .row output {
+    flex: 0 0 3.6em; text-align: right;
+    font: 13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--star);
+  }
+  input[type=range] { flex: 1; min-width: 0; accent-color: var(--sage); }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  button {
+    font: inherit; font-size: 14px; color: var(--text);
+    background: transparent; border: 1px solid var(--line); border-radius: 999px;
+    padding: 5px 15px; cursor: pointer; transition: border-color .2s, color .2s;
+  }
+  button:hover, button:focus-visible { border-color: var(--sage); color: #fff; outline: none; }
+  button[aria-pressed=true] { border-color: var(--sage); color: var(--sage); }
+  .check { display: flex; align-items: center; gap: 9px; font-size: 14px; color: var(--muted); margin-bottom: 10px; }
+  .check input { accent-color: var(--sage); width: 16px; height: 16px; }
+
+  dl { margin: 0 0 22px; }
+  dt { color: var(--star); margin-top: 14px; }
+  dd { margin: 0; color: var(--muted); font-size: 15px; }
+  blockquote {
+    margin: 0 0 14px; padding: 12px 16px;
+    border-left: 2px solid var(--sage); background: var(--ink-2);
+    font-size: 15px; border-radius: 0 6px 6px 0;
+  }
+  ol.next { list-style: none; padding: 0; margin: 8px 0 0; color: var(--muted); font-size: 15px; }
+  ol.next li { padding: 7px 0; border-top: 1px solid var(--line); display: flex; gap: 14px; }
+  ol.next li span { flex: 0 0 1.6em; color: #5f6279; font-family: ui-monospace, monospace; }
+  ol.next li.done { color: var(--star); }
+  ol.next li.done span { color: var(--sage); }
+  .hint { font-size: 13px; color: #6d7089; margin-top: 28px; }
+
+  @media (min-width: 900px) {
+    #stage { left: var(--col); height: auto; bottom: 0; border-bottom: 0; border-left: 1px solid var(--line); }
+    #inset { right: 20px; bottom: 20px; width: 34%; }
+    main { padding-top: 0; width: var(--col); }
+    section { min-height: 100vh; padding: 80px 44px; }
+    h1 { font-size: 40px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    section, #inset { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="stage" aria-hidden="true">
+  <canvas id="c"></canvas>
+  <div id="hud"></div>
+  <div id="inset"><span>從外面看這台相機</span></div>
+</div>
+
+<main>
+
+  <section data-step="0">
+    <p class="kicker"><span class="brand">ひとめぐり</span>　星空教本</p>
+    <h1>第一章<br>一顆星</h1>
+    <p class="lead">整本教本只養一個場景。這一章從全黑開始，結束時畫面上會有一顆會轉的星，而你會知道它是怎麼被畫出來的。</p>
+    <p class="lead">旁邊那塊黑色不是還沒載入。它就是起點。</p>
+    <p class="hint">往下捲 ↓</p>
+  </section>
+
+  <section data-step="1">
+    <p class="kicker">01　SCENE</p>
+    <h2>場景是一個空的容器</h2>
+    <p>3D 畫面裡的所有東西，都要先被放進一個<strong>場景</strong>。它本身看不見，只是一個有座標的空間。</p>
+    <pre><i>// 空間有了，但裡面什麼都沒有</i>
+const scene = new THREE.Scene();</pre>
+    <p>為了看得見這個空間，先放一張格線當地板，再放三條軸線：紅色是 X（左右），綠色是 Y（上下），藍色是 Z（前後）。</p>
+    <div class="panel">
+      <label class="check"><input type="checkbox" id="gridToggle" checked> 顯示格線與座標軸</label>
+    </div>
+    <p class="lead">格線和軸線是鷹架，成品裡不會有。但學的時候沒有它們，你分不出東西是變大了還是變近了。</p>
+  </section>
+
+  <section data-step="2">
+    <p class="kicker">02　MESH</p>
+    <h2>放進第一顆星</h2>
+    <p>一個看得見的物體由兩樣東西組成：<strong>形狀</strong>（幾何）和<strong>表面</strong>（材質）。兩者合起來叫 mesh，加進場景才會出現。</p>
+    <pre>const shape   = new THREE.IcosahedronGeometry(1, 1);
+const surface = new THREE.MeshBasicMaterial({ color: <b>0xecdcae</b> });
+const star    = new THREE.Mesh(shape, surface);
+scene.add(star);</pre>
+    <p>現在它是一顆由三角形拼成的多面體，表面只有一個平平的顏色，沒有明暗。線條是我特地畫上去的，不然你看不出它在轉。</p>
+    <p class="lead">它還不像星星。質感是下一章的事，這一章先確定它「在那裡」。</p>
+  </section>
+
+  <section data-step="3">
+    <p class="kicker">03　CAMERA</p>
+    <h2>你看到的，是相機看到的</h2>
+    <p>場景本身沒有「畫面」。畫面來自一台<strong>相機</strong>：它站在哪裡、看向哪裡、視角多寬，決定了一切。</p>
+    <p>右下角的小視窗是從外面看這台相機。那個錐形就是它看得到的範圍，錐形以外的東西不會被畫出來。</p>
+    <pre>const camera = new THREE.PerspectiveCamera(
+  <b id="codeFov">50</b>,      <i>// 視角（度）</i>
+  aspect,  <i>// 畫面長寬比</i>
+  0.5, 14  <i>// 最近與最遠看得到的距離</i>
+);
+camera.position.z = <b id="codeDist">6.0</b>;</pre>
+    <div class="panel">
+      <div class="row"><label for="fov">視角</label><input type="range" id="fov" min="15" max="100" step="1" value="50"><output id="fovOut">50°</output></div>
+      <div class="row"><label for="dist">距離</label><input type="range" id="dist" min="2.2" max="12" step="0.1" value="6"><output id="distOut">6.0</output></div>
+      <div class="btns">
+        <button type="button" data-fov="95" data-dist="2.6">廣角貼近</button>
+        <button type="button" data-fov="50" data-dist="6">標準</button>
+        <button type="button" data-fov="24" data-dist="12">長焦遠拍</button>
+      </div>
+    </div>
+    <p>按那三顆按鈕比較看看。星星在畫面上差不多一樣大，但感覺完全不同：廣角貼近時格線急速往遠方收，有壓迫感；長焦遠拍時格線幾乎平行，畫面安靜而扁平。</p>
+    <p class="lead">這就是為什麼「放大」有兩種做法，而它們不是同一件事。</p>
+  </section>
+
+  <section data-step="4">
+    <p class="kicker">04　RENDER LOOP</p>
+    <h2>動畫是一張一張畫出來的</h2>
+    <p>相機不會自己錄影。每一<strong>幀</strong>都是程式重新做一次三件事：把東西挪一點點、叫相機拍一張、等下一次輪到自己。</p>
+    <pre>function tick() {
+  star.rotation.y += 0.01;         <i>// 1. 挪一點</i>
+  renderer.render(scene, camera);  <i>// 2. 拍一張</i>
+  requestAnimationFrame(tick);     <i>// 3. 排下一張</i>
+}</pre>
+    <div class="panel">
+      <div class="btns">
+        <button type="button" id="pause" aria-pressed="false">暫停迴圈</button>
+      </div>
+      <div class="row"><label for="fps">每秒幾幀</label><input type="range" id="fps" min="1" max="60" step="1" value="60"><output id="fpsOut">60</output></div>
+      <div class="row"><label>已畫幀數</label><span style="flex:1"></span><output id="frames" style="flex-basis:6em">0</output></div>
+    </div>
+    <p>把幀數拉到 5 以下，星星會變成一格一格跳。它轉的速度沒有變，只是你看到的張數變少了。暫停之後連那個數字都會停，因為根本沒有人在畫。</p>
+    <p class="lead">之後所有會動的東西，包括捲動運鏡和粒子，都是在這個迴圈裡做的。</p>
+  </section>
+
+  <section data-step="5">
+    <p class="kicker">05　怎麼說</p>
+    <h2>這一章給你的詞彙</h2>
+    <p>鷹架拆掉了，剩下一顆星。以後跟模型或設計師描述畫面時，這些詞現在有了對應的畫面：</p>
+    <dl>
+      <dt>廣角／長焦</dt><dd>視角的寬窄。廣角誇張、有臨場感；長焦壓縮、安靜。</dd>
+      <dt>透視感</dt><dd>遠近物體的大小落差。貼近加廣角會變強，退遠加長焦會變弱。</dd>
+      <dt>近裁面／遠裁面</dt><dd>相機看得到的最近與最遠距離。東西莫名消失，通常是跑到這個範圍外了。</dd>
+      <dt>幀率</dt><dd>每秒畫幾張。順不順是它決定的，快不快不是。</dd>
+    </dl>
+    <p>所以同一個需求，可以從模糊變成精確：</p>
+    <blockquote>✕　「星星大一點、有氣勢一點。」</blockquote>
+    <blockquote>○　「相機貼近到距離 3 左右，視角開到 80 度以上，讓星星佔畫面一半，邊緣帶一點廣角變形。」</blockquote>
+    <ol class="next">
+      <li class="done"><span>01</span>場景、相機、渲染迴圈</li>
+      <li><span>02</span>幾何與材質：讓它有質感</li>
+      <li><span>03</span>光與陰影</li>
+      <li><span>04</span>動畫與緩動</li>
+      <li><span>05</span>捲動驅動的相機</li>
+      <li><span>06</span>粒子：從一顆星到一片星空</li>
+      <li><span>07</span>Shader 入門</li>
+      <li><span>08</span>後製</li>
+      <li><span>09</span>克制與效能</li>
+    </ol>
+  </section>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+  var stage = document.getElementById('stage');
+  var canvas = document.getElementById('c');
+  var hud = document.getElementById('hud');
+  var insetEl = document.getElementById('inset');
+  var $ = function (id) { return document.getElementById(id); };
+
+  if (!window.THREE) { hud.textContent = 'three.js 沒有載入成功，請重新整理。'; return; }
+
+  var renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+  } catch (e) {
+    hud.textContent = '這個瀏覽器無法啟用 WebGL。';
+    return;
+  }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.autoClear = false;
+
+  var scene = new THREE.Scene();
+
+  var grid = new THREE.GridHelper(12, 12, 0x444a6b, 0x282c44);
+  grid.position.y = -1.2;
+  var axes = new THREE.AxesHelper(1.6);
+  axes.position.y = -1.19;
+  scene.add(grid, axes);
+
+  var star = new THREE.Group();
+  var geo = new THREE.IcosahedronGeometry(1, 1);
+  star.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+    color: 0xecdcae, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1
+  })));
+  star.add(new THREE.LineSegments(
+    new THREE.WireframeGeometry(geo),
+    new THREE.LineBasicMaterial({ color: 0x8a7a4e })
+  ));
+  star.scale.setScalar(0.0001);
+  star.visible = false;
+  scene.add(star);
+
+  var camera = new THREE.PerspectiveCamera(50, 1, 0.5, 14);
+  var helper = new THREE.CameraHelper(camera);
+  helper.visible = false;
+  scene.add(helper);
+
+  var observer = new THREE.PerspectiveCamera(38, 4 / 3, 0.1, 100);
+  observer.position.set(11, 6.5, 14);
+  observer.lookAt(0, 0, 4);
+
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var state = { step: 0, fov: 50, dist: 6, paused: reduced, fps: 60, frames: 0, showGrid: true };
+  var dirty = true;
+
+  var HUD = [
+    'scene: 空',
+    'scene: 格線 + 座標軸',
+    'scene: 格線 + 座標軸 + star',
+    'scene: 格線 + 座標軸 + star',
+    'scene: 格線 + 座標軸 + star',
+    'scene: star'
+  ];
+
+  function applyStep() {
+    var s = state.step;
+    var scaffold = s >= 1 && s <= 4 && state.showGrid;
+    grid.visible = scaffold;
+    axes.visible = scaffold;
+    insetEl.classList.toggle('on', s === 3 || s === 4);
+    hud.textContent = (s >= 1 && s <= 4 && !state.showGrid) ? HUD[s].replace('格線 + 座標軸', '（鷹架已隱藏）') : HUD[s];
+    dirty = true;
+  }
+
+  function applyCamera() {
+    camera.fov = state.fov;
+    camera.position.set(0, 0.4, state.dist);
+    camera.lookAt(0, 0, 0);
+    camera.updateProjectionMatrix();
+    helper.update();
+    $('codeFov').textContent = state.fov;
+    $('codeDist').textContent = state.dist.toFixed(1);
+    $('fovOut').textContent = state.fov + '°';
+    $('distOut').textContent = state.dist.toFixed(1);
+    $('fov').value = state.fov;
+    $('dist').value = state.dist;
+    dirty = true;
+  }
+
+  function resize() {
+    var w = stage.clientWidth, h = stage.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    helper.update();
+    dirty = true;
+  }
+
+  function render() {
+    var w = stage.clientWidth, h = stage.clientHeight;
+    renderer.setScissorTest(true);
+
+    renderer.setViewport(0, 0, w, h);
+    renderer.setScissor(0, 0, w, h);
+    renderer.setClearColor(0x12141f, 1);
+    renderer.clear();
+    helper.visible = false;
+    renderer.render(scene, camera);
+
+    if (state.step === 3 || state.step === 4) {
+      var r = insetEl.getBoundingClientRect(), s = stage.getBoundingClientRect();
+      var x = r.left - s.left, y = s.bottom - r.bottom;
+      if (r.width > 2 && r.height > 2) {
+        renderer.setViewport(x, y, r.width, r.height);
+        renderer.setScissor(x, y, r.width, r.height);
+        renderer.setClearColor(0x1b1e2e, 1);
+        renderer.clear();
+        observer.aspect = r.width / r.height;
+        observer.updateProjectionMatrix();
+        helper.visible = true;
+        var g = grid.visible, a = axes.visible;
+        grid.visible = true; axes.visible = true;
+        renderer.render(scene, observer);
+        grid.visible = g; axes.visible = a;
+        helper.visible = false;
+      }
+    }
+  }
+
+  /* ---------- which section is active ---------- */
+  var sections = Array.prototype.slice.call(document.querySelectorAll('section'));
+  function pickStep() {
+    var wide = window.innerWidth >= 900;
+    var top = wide ? 0 : stage.getBoundingClientRect().bottom;
+    var probe = top + (window.innerHeight - top) * (wide ? 0.5 : 0.45);
+    var found = 0;
+    for (var i = 0; i < sections.length; i++) {
+      var r = sections[i].getBoundingClientRect();
+      if (r.top <= probe) found = i;
+    }
+    for (var j = 0; j < sections.length; j++) sections[j].classList.toggle('active', j === found);
+    var step = +sections[found].getAttribute('data-step');
+    if (step !== state.step) { state.step = step; applyStep(); }
+  }
+
+  /* ---------- controls ---------- */
+  $('gridToggle').addEventListener('change', function (e) { state.showGrid = e.target.checked; applyStep(); });
+  $('fov').addEventListener('input', function (e) { state.fov = +e.target.value; applyCamera(); });
+  $('dist').addEventListener('input', function (e) { state.dist = +e.target.value; applyCamera(); });
+  Array.prototype.forEach.call(document.querySelectorAll('button[data-fov]'), function (b) {
+    b.addEventListener('click', function () {
+      state.fov = +b.getAttribute('data-fov');
+      state.dist = +b.getAttribute('data-dist');
+      applyCamera();
+    });
+  });
+  var pauseBtn = $('pause');
+  function syncPause() {
+    pauseBtn.setAttribute('aria-pressed', state.paused ? 'true' : 'false');
+    pauseBtn.textContent = state.paused ? '繼續迴圈' : '暫停迴圈';
+  }
+  pauseBtn.addEventListener('click', function () { state.paused = !state.paused; syncPause(); });
+  $('fps').addEventListener('input', function (e) {
+    state.fps = +e.target.value; $('fpsOut').textContent = state.fps;
+  });
+
+  /* ---------- loop ---------- */
+  var last = performance.now(), acc = 0, framesEl = $('frames');
+  function tick(now) {
+    requestAnimationFrame(tick);
+    var dt = Math.min((now - last) / 1000, 0.1);
+    last = now;
+
+    var target = state.step >= 2 ? 1 : 0;
+    var s = star.scale.x;
+    var ns = reduced ? target : s + (target - s) * Math.min(1, dt * 6);
+    if (Math.abs(ns - s) > 0.0005) {
+      star.scale.setScalar(Math.max(ns, 0.0001));
+      star.visible = ns > 0.002;
+      dirty = true;
+    }
+
+    if (!state.paused) {
+      acc += dt;
+      if (acc >= 1 / state.fps - 0.002) {
+        star.rotation.y += acc * 0.6;
+        star.rotation.x += acc * 0.22;
+        acc = 0;
+        state.frames++;
+        framesEl.textContent = state.frames;
+        render();
+        dirty = false;
+      }
+    } else if (dirty) {
+      render();
+      dirty = false;
+    }
+  }
+
+  window.addEventListener('resize', function () { resize(); pickStep(); });
+  window.addEventListener('scroll', pickStep, { passive: true });
+
+  syncPause();
+  resize();
+  applyCamera();
+  applyStep();
+  pickStep();
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
