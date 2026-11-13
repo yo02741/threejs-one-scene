@@ -14,10 +14,11 @@ import chapter07 from './chapters/07-shader.js';
 import chapter08 from './chapters/08-post.js';
 import chapter09 from './chapters/09-restraint.js';
 import chapter10 from './chapters/10-interaction.js';
+import chapter11 from './chapters/11-model.js';
 import { EASE, clamp, lerp } from './motion.js';
 
 // 依閱讀順序排列；新章節加在後面
-const CHAPTERS = [chapter01, chapter02, chapter03, chapter04, chapter05, chapter06, chapter07, chapter08, chapter09, chapter10];
+const CHAPTERS = [chapter01, chapter02, chapter03, chapter04, chapter05, chapter06, chapter07, chapter08, chapter09, chapter10, chapter11];
 
 const $ = (id) => document.getElementById(id);
 const stageEl = $('stage'), hud = $('hud'), hud2 = $('hud2'), insetEl = $('inset');

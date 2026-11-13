@@ -54,6 +54,5 @@ export function createPost(renderer, scene, camera) {
         direct(Math.round(w * P.split));
       }
     },
-    off() { renderer.toneMapping = NoToneMapping; },
   };
 }

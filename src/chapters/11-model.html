@@ -1,0 +1,120 @@
+<div class="chapter" id="ch11">
+
+  <section data-chapter="E1" data-step="0">
+    <p class="kicker"><span class="brand">ひとめぐり</span>　星空教本　選修</p>
+    <h1>選修<br>請別人的模型進來</h1>
+    <p class="lead">到目前為止，場景裡的每一樣東西都是用程式算出來的。但大部分的 3D 網站，主角是別人在建模軟體裡做好的模型。這一篇不教建模，只教一件事：怎麼把現成的模型請進你的場景，而不顯得突兀。</p>
+    <p class="lead">主星的右邊空出來了。等一下會有客人。</p>
+  </section>
+
+  <section data-chapter="E1" data-step="1">
+    <p class="kicker">01　LOAD</p>
+    <h2>載入，然後發現不對勁</h2>
+    <p>場景裡已經載入了一盞提燈。你看到的應該是一大塊灰色的東西，連主星都被擋住了：那是提燈的底座。按「酪梨」換另一個模型：這次你大概什麼都看不到。</p>
+    <div class="panel">
+      <div class="btns">
+        <button type="button" data-k="which" data-v="lantern">提燈</button>
+        <button type="button" data-k="which" data-v="avocado">酪梨</button>
+      </div>
+      <p class="stat">這個模型最長的一邊：<span id="modelSize">載入中</span> 個單位（主星的半徑是 1）</p>
+      <label class="check"><input type="checkbox" data-k="box"> 顯示包圍盒與原點</label>
+    </div>
+    <pre>const loader = new GLTFLoader();
+loader.load('<b data-c="which"></b>.gltf', (gltf) => {
+  scene.add(gltf.scene);  <i>// 整個模型是一棵物件樹，直接加進場景</i>
+});</pre>
+    <p><strong>glTF</strong> 是 3D 模型的通用格式，地位像圖片裡的 JPEG：一個檔案裡包著形狀、材質和貼圖。它還有一個把所有東西打包成單一檔案的版本，副檔名是 <strong>.glb</strong>。</p>
+    <p>載入只要四行，問題在載入之後。綠色的框是<strong>包圍盒</strong>（模型佔了多大的空間），三條短線是它的<strong>原點</strong>（它自己的 0, 0, 0）。提燈有二十幾個單位高，原點在柱子的底部；酪梨只有 0.06 個單位。兩個檔案都沒有錯，它們只是各自用了自己的<strong>尺度</strong>。</p>
+    <p class="lead">模型「放進來就剛剛好」幾乎不會發生。每個模型都有自己的單位和自己的原點。</p>
+  </section>
+
+  <section data-chapter="E1" data-step="2">
+    <p class="kicker">02　FIT</p>
+    <h2>先量，再擺</h2>
+    <p>勾選「自動置中並校正大小」。然後兩個模型來回切換：這次它們一樣大，也都在同一個位置。</p>
+    <div class="panel">
+      <div class="btns">
+        <button type="button" data-k="which" data-v="lantern">提燈</button>
+        <button type="button" data-k="which" data-v="avocado">酪梨</button>
+      </div>
+      <label class="check"><input type="checkbox" data-k="fit"> 自動置中並校正大小</label>
+      <div class="row"><label>縮放</label><input type="range" data-k="scale" min="0.2" max="3" step="0.05"><output data-o="scale" data-u="×"></output></div>
+      <div class="row"><label>旋轉</label><input type="range" data-k="rotY" min="-180" max="180" step="5"><output data-o="rotY" data-u="°"></output></div>
+      <label class="check"><input type="checkbox" data-k="box"> 顯示包圍盒與原點</label>
+    </div>
+    <pre>const box = new THREE.Box3().setFromObject(model);  <i>// 量它有多大</i>
+model.position.sub(box.getCenter(中心));            <i>// 把中心移到原點</i>
+model.scale.setScalar(1.8 / 最長的那一邊 * <b data-c="scale"></b>);
+model.rotation.y = <b data-c="rotY"></b>°;</pre>
+    <p>做法是先量出包圍盒，把它的中心移到原點，再依最長的那一邊縮放到你要的大小。這幾行可以包成一個函式，之後不管誰給你什麼模型，先過一次這個函式，再談擺在哪裡。</p>
+    <p>校正完之後，縮放和旋轉才有意義：「1 倍」就是你定的標準大小，旋轉也是繞著模型的中心轉，而不是繞著某個遠在天邊的原點。</p>
+    <p class="lead">拿到模型的第一件事不是看它好不好看，是量它多大、原點在哪。</p>
+  </section>
+
+  <section data-chapter="E1" data-step="3">
+    <p class="kicker">03　BLEND IN</p>
+    <h2>讓它看起來屬於這裡</h2>
+    <p>模型已經校正好了。把材質從「模型自己的」換成「這本書的」，再拉「環境反射」。</p>
+    <div class="panel">
+      <div class="btns">
+        <button type="button" data-k="which" data-v="lantern">提燈</button>
+        <button type="button" data-k="which" data-v="avocado">酪梨</button>
+      </div>
+      <div class="btns">
+        <button type="button" data-k="override" data-v="false">模型自己的材質</button>
+        <button type="button" data-k="override" data-v="true">這本書的材質</button>
+      </div>
+      <div class="row"><label>環境反射</label><input type="range" data-k="env" min="0" max="2" step="0.05"><output data-o="env"></output></div>
+      <div class="row"><label>旋轉</label><input type="range" data-k="rotY" min="-180" max="180" step="5"><output data-o="rotY" data-u="°"></output></div>
+    </div>
+    <pre>model.traverse((part) => {
+  if (part.isMesh) part.material = <b data-mat></b>;
+});
+scene.environmentIntensity = <b data-c="env"></b>;</pre>
+    <p>模型帶著自己的材質來：一組<strong>貼圖</strong>，分別記錄每個位置的顏色、粗糙度、金屬感和表面的細小凹凸。這就是第二章那兩個數字的「每個像素各一個值」版本，所以提燈上才會有鏽斑和亮面。</p>
+    <p>它已經被第三章的三盞燈照著了，不用另外打光：只要材質是會回應光的那一種，進了場景就吃場景的光。金屬的部分暗暗的，是因為環境反射在第三章被調得很低；拉高它，金屬才有東西可以映。</p>
+    <p>換成「這本書的材質」，模型的細節全部消失，但它突然和主星是同一個世界的東西了。兩種都不是錯的，是選擇：要它的寫實，還是要整體的一致。</p>
+    <p class="lead">模型是在別人的光線下做的。進了你的場景，就要用你的光、你的規矩重新看一次。</p>
+  </section>
+
+  <section data-chapter="E1" data-step="3.5">
+    <p class="kicker">練習</p>
+    <h2>反過來：照著描述調出來</h2>
+    <p>兩段描述，把畫面調成那個樣子。調對了會打勾；卡住的話，下面會提示還差什麼。</p>
+    <div class="panel">
+      <div class="btns">
+        <button type="button" data-k="which" data-v="lantern">提燈</button>
+        <button type="button" data-k="which" data-v="avocado">酪梨</button>
+      </div>
+      <label class="check"><input type="checkbox" data-k="fit"> 自動置中並校正大小</label>
+      <div class="row"><label>縮放</label><input type="range" data-k="scale" min="0.2" max="3" step="0.05"><output data-o="scale" data-u="×"></output></div>
+      <div class="row"><label>旋轉</label><input type="range" data-k="rotY" min="-180" max="180" step="5"><output data-o="rotY" data-u="°"></output></div>
+      <div class="btns">
+        <button type="button" data-k="override" data-v="false">模型自己的材質</button>
+        <button type="button" data-k="override" data-v="true">這本書的材質</button>
+      </div>
+      <div class="row"><label>環境反射</label><input type="range" data-k="env" min="0" max="2" step="0.05"><output data-o="env"></output></div>
+    </div>
+    <div class="panel" data-practice></div>
+  </section>
+
+  <section data-chapter="E1" data-step="4">
+    <p class="kicker">04　怎麼說</p>
+    <h2>這一篇給你的詞彙</h2>
+    <p>客人走了，場景回到成品的樣子。這一篇沒有在成品裡留下任何東西，留下的是一套流程：載入、量、校正、決定材質。</p>
+    <dl>
+      <dt>glTF／GLB</dt><dd>3D 模型的通用格式。GLB 是打包成單一檔案的版本。</dd>
+      <dt>尺度</dt><dd>模型用的單位。一個單位可能是一公尺，也可能是一公分。</dd>
+      <dt>原點</dt><dd>模型自己的 0, 0, 0。旋轉和縮放都繞著它。</dd>
+      <dt>包圍盒</dt><dd>剛好包住模型的那個方盒。用來量大小、找中心。</dd>
+      <dt>貼圖</dt><dd>記錄表面每個位置的顏色、粗糙度、金屬感、凹凸的圖片。</dd>
+      <dt>覆寫材質</dt><dd>不用模型自己的材質，換成你場景裡統一的那一種。</dd>
+    </dl>
+    <p>同一個需求，從模糊到精確：</p>
+    <blockquote>✕　「把這個模型放進去。」</blockquote>
+    <blockquote>○　「模型先置中、校正到主星的兩倍高，放在主星右邊，轉 30 度讓正面朝向相機。保留它自己的貼圖，用場景現有的三盞燈，環境反射開到 0.8 讓金屬的部分有東西可以映。」</blockquote>
+    <p class="lead">模型來源與授權記在 <code>public/models/README.md</code>。兩個都是 Khronos 提供的 CC0 範例模型。</p>
+    <ol class="next" data-toc="11"></ol>
+  </section>
+
+</div>

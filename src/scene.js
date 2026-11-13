@@ -2,7 +2,7 @@
 // 它不知道「章節」是什麼，只負責照著一份參數（見 params.js）長成對應的樣子。
 import {
   AxesHelper, BufferGeometry, CameraHelper, Color, Float32BufferAttribute, GridHelper, Line,
-  LineBasicMaterial, Mesh, MeshBasicMaterial, PerspectiveCamera, SphereGeometry, Raycaster, Scene, Vector2, Vector3, WebGLRenderer,
+  LineBasicMaterial, Mesh, MeshBasicMaterial, NoToneMapping, PerspectiveCamera, SphereGeometry, Raycaster, Scene, Vector2, Vector3, WebGLRenderer,
 } from 'three';
 import { defaults } from './params.js';
 import { smooth } from './motion.js';
@@ -11,7 +11,6 @@ import { createStar } from './scene/star.js';
 import { createLights } from './scene/lights.js';
 import { createParticles } from './scene/particles.js';
 import { createGlow } from './scene/glow.js';
-import { createPost } from './scene/post.js';
 
 const INK = 0x12141f, INK2 = 0x1b1e2e;
 
@@ -62,7 +61,19 @@ export function createStage(canvas, stageEl, insetEl, reduced) {
   const lights = createLights(scene, renderer);
   const particles = createParticles(scene, renderer);
   const glow = createGlow(scene, star);
-  const post = createPost(renderer, scene, camera);
+
+  // 後製和模型載入器比較大，而且前幾章用不到：等快要用到時才下載
+  let post = null, model = null, wake = false;
+  const lazy = { post: false, model: false };
+  function need(what) {
+    if (lazy[what]) return;
+    lazy[what] = true;
+    if (what === 'post') {
+      import('./scene/post.js').then((m) => { post = m.createPost(renderer, scene, camera); resize(); wake = true; });
+    } else {
+      import('./scene/model.js').then((m) => { model = m.createModel(scene, star.standard, () => { wake = true; }); wake = true; });
+    }
+  }
 
   let T = defaults();        // 目標：這一刻場景「應該」是什麼樣子
   const S = defaults();      // 現況：每一幀往目標靠近一點
@@ -85,6 +96,7 @@ export function createStage(canvas, stageEl, insetEl, reduced) {
     lights.apply(S);
     particles.apply(S);
     glow.apply(S);
+    model?.apply(S);
     if (S.path) {
       const attr = pathLine.geometry.getAttribute('position');
       for (let i = 0; i <= 64; i++) attr.setXYZ(i, ...orbitPoint(S.path, i / 64));
@@ -98,7 +110,7 @@ export function createStage(canvas, stageEl, insetEl, reduced) {
     pixelRatio = Math.min(window.devicePixelRatio || 1, S.pr);
     renderer.setPixelRatio(pixelRatio);
     renderer.setSize(w, h, false);
-    post.setSize(w, h, pixelRatio);
+    post?.setSize(w, h, pixelRatio);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     helper.update();
@@ -109,6 +121,9 @@ export function createStage(canvas, stageEl, insetEl, reduced) {
   function settle(dt) {
     const k = reduced ? { fast: 1, slow: 1 } : { fast: 1 - Math.exp(-14 * dt), slow: Math.min(1, dt * 6) };
     let changed = smooth(S, T, k);
+    if (wake) { wake = false; changed = true; }
+    if (T.post.on || T.glow.on) need('post');   // 第 7 章就先下載，第 8 章才不會頓一下
+    if (T.model.on) need('model');
 
     const c = T.cam;
     const kc = reduced || c.damp >= 1 ? 1 : 1 - Math.pow(1 - c.damp, dt * 60);
@@ -191,8 +206,8 @@ export function createStage(canvas, stageEl, insetEl, reduced) {
 
   function render() {
     renderer.info.reset();
-    if (S.post.on && !S.inset) post.render(S, stageEl.clientWidth, stageEl.clientHeight, direct);
-    else { post.off(); direct(); }
+    if (S.post.on && !S.inset && post) post.render(S, stageEl.clientWidth, stageEl.clientHeight, direct);
+    else { renderer.toneMapping = NoToneMapping; direct(); }
   }
 
   camera.position.copy(cam.pos);
@@ -202,9 +217,10 @@ export function createStage(canvas, stageEl, insetEl, reduced) {
   return {
     S, renderer, scene, camera, star, render, resize, settle,
     setTarget(P) { T = P; },
+    modelSize(which) { return model ? model.info(which) : null; },
     setPointer(x, y, on) { pointer.x = x; pointer.y = y; pointer.on = on; },
     get hovering() { return !!pointer.hit; },
-    animate(dt) { star.animate(dt, S); particles.animate(dt, S); glow.animate(dt, S); post.tick(dt); },
+    animate(dt) { star.animate(dt, S); particles.animate(dt, S); glow.animate(dt, S); post?.tick(dt); },
     // 這個畫面座標有沒有點到星星
     hitsStar(clientX, clientY) {
       const r = canvas.getBoundingClientRect();

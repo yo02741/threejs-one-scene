@@ -67,6 +67,15 @@ export const defaults = () => ({
     radius: 1.6,            // 影響的半徑
   },
 
+  /* ---- 選修：模型 ---- */
+  model: {
+    on: false, which: 'lantern',
+    fit: false,             // 自動置中、校正大小
+    scale: 1, rotY: 0,
+    box: false,             // 鷹架：包圍盒與原點
+    override: false,        // 改用這本書的材質
+  },
+
   /* ---- 第 9 章 ---- */
   pr: 2,                    // 像素比上限
   mul: 1,                   // 粒子數倍率
