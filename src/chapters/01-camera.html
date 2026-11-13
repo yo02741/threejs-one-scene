@@ -1,0 +1,94 @@
+<div class="chapter" id="ch1">
+  <section data-chapter="01" data-step="0">
+    <p class="kicker"><span class="brand">ひとめぐり</span>　星空教本</p>
+    <h1>第一章<br>一顆星</h1>
+    <p class="lead">整本教本只養一個場景。這一章從全黑開始，結束時畫面上會有一顆會轉的星，而你會知道它是怎麼被畫出來的。</p>
+    <p class="lead">旁邊那塊黑色不是還沒載入。它就是起點。</p>
+    <p class="hint">往下捲 ↓</p>
+  </section>
+
+  <section data-chapter="01" data-step="1">
+    <p class="kicker">01　SCENE</p>
+    <h2>場景是一個空的容器</h2>
+    <p>3D 畫面裡的所有東西，都要先被放進一個<strong>場景</strong>。它本身看不見，只是一個有座標的空間。</p>
+    <pre><i>// 空間有了，但裡面什麼都沒有</i>
+const scene = new THREE.Scene();</pre>
+    <p>為了看得見這個空間，先放一張格線當地板，再放三條軸線：紅色是 X（左右），綠色是 Y（上下），藍色是 Z（前後）。</p>
+    <div class="panel">
+      <label class="check"><input type="checkbox" id="gridToggle" checked> 顯示格線與座標軸</label>
+    </div>
+    <p class="lead">格線和軸線是鷹架，成品裡不會有。但學的時候沒有它們，你分不出東西是變大了還是變近了。</p>
+  </section>
+
+  <section data-chapter="01" data-step="2">
+    <p class="kicker">02　MESH</p>
+    <h2>放進第一顆星</h2>
+    <p>一個看得見的物體由兩樣東西組成：<strong>形狀</strong>（幾何）和<strong>表面</strong>（材質）。兩者合起來叫 mesh，加進場景才會出現。</p>
+    <pre>const shape   = new THREE.IcosahedronGeometry(1, 1);
+const surface = new THREE.MeshBasicMaterial({ color: <b>0xecdcae</b> });
+const star    = new THREE.Mesh(shape, surface);
+scene.add(star);</pre>
+    <p>現在它是一顆由三角形拼成的多面體，表面只有一個平平的顏色，沒有明暗。線條是我特地畫上去的，不然你看不出它在轉。</p>
+    <p class="lead">它還不像星星。質感是下一章的事，這一章先確定它「在那裡」。</p>
+  </section>
+
+  <section data-chapter="01" data-step="3">
+    <p class="kicker">03　CAMERA</p>
+    <h2>你看到的，是相機看到的</h2>
+    <p>場景本身沒有「畫面」。畫面來自一台<strong>相機</strong>：它站在哪裡、看向哪裡、視角多寬，決定了一切。</p>
+    <p>右下角的小視窗是從外面看這台相機。那個錐形就是它看得到的範圍，錐形以外的東西不會被畫出來。</p>
+    <pre>const camera = new THREE.PerspectiveCamera(
+  <b id="codeFov">50</b>,      <i>// 視角（度）</i>
+  aspect,  <i>// 畫面長寬比</i>
+  0.5, 14  <i>// 最近與最遠看得到的距離</i>
+);
+camera.position.z = <b id="codeDist">6.0</b>;</pre>
+    <div class="panel">
+      <div class="row"><label for="fov">視角</label><input type="range" id="fov" min="15" max="100" step="1" value="50"><output id="fovOut">50°</output></div>
+      <div class="row"><label for="dist">距離</label><input type="range" id="dist" min="2.2" max="12" step="0.1" value="6"><output id="distOut">6.0</output></div>
+      <div class="btns">
+        <button type="button" data-fov="95" data-dist="2.6">廣角貼近</button>
+        <button type="button" data-fov="50" data-dist="6">標準</button>
+        <button type="button" data-fov="24" data-dist="12">長焦遠拍</button>
+      </div>
+    </div>
+    <p>按那三顆按鈕比較看看。星星在畫面上差不多一樣大，但感覺完全不同：廣角貼近時格線急速往遠方收，有壓迫感；長焦遠拍時格線幾乎平行，畫面安靜而扁平。</p>
+    <p class="lead">這就是為什麼「放大」有兩種做法，而它們不是同一件事。</p>
+  </section>
+
+  <section data-chapter="01" data-step="4">
+    <p class="kicker">04　RENDER LOOP</p>
+    <h2>動畫是一張一張畫出來的</h2>
+    <p>相機不會自己錄影。每一<strong>幀</strong>都是程式重新做一次三件事：把東西挪一點點、叫相機拍一張、等下一次輪到自己。</p>
+    <pre>function tick() {
+  star.rotation.y += 0.01;         <i>// 1. 挪一點</i>
+  renderer.render(scene, camera);  <i>// 2. 拍一張</i>
+  requestAnimationFrame(tick);     <i>// 3. 排下一張</i>
+}</pre>
+    <div class="panel">
+      <div class="btns">
+        <button type="button" id="pause" aria-pressed="false">暫停迴圈</button>
+      </div>
+      <div class="row"><label for="fps">每秒幾幀</label><input type="range" id="fps" min="1" max="60" step="1" value="60"><output id="fpsOut">60</output></div>
+      <div class="row"><label>已畫幀數</label><span style="flex:1"></span><output id="frames" style="flex-basis:6em">0</output></div>
+    </div>
+    <p>把幀數拉到 5 以下，星星會變成一格一格跳。它轉的速度沒有變，只是你看到的張數變少了。暫停之後連那個數字都會停，因為根本沒有人在畫。</p>
+    <p class="lead">之後所有會動的東西，包括捲動運鏡和粒子，都是在這個迴圈裡做的。</p>
+  </section>
+
+  <section data-chapter="01" data-step="5">
+    <p class="kicker">05　怎麼說</p>
+    <h2>這一章給你的詞彙</h2>
+    <p>鷹架拆掉了，剩下一顆星。以後跟模型或設計師描述畫面時，這些詞現在有了對應的畫面：</p>
+    <dl>
+      <dt>廣角／長焦</dt><dd>視角的寬窄。廣角誇張、有臨場感；長焦壓縮、安靜。</dd>
+      <dt>透視感</dt><dd>遠近物體的大小落差。貼近加廣角會變強，退遠加長焦會變弱。</dd>
+      <dt>近裁面／遠裁面</dt><dd>相機看得到的最近與最遠距離。東西莫名消失，通常是跑到這個範圍外了。</dd>
+      <dt>幀率</dt><dd>每秒畫幾張。順不順是它決定的，快不快不是。</dd>
+    </dl>
+    <p>所以同一個需求，可以從模糊變成精確：</p>
+    <blockquote>✕　「星星大一點、有氣勢一點。」</blockquote>
+    <blockquote>○　「相機貼近到距離 3 左右，視角開到 80 度以上，讓星星佔畫面一半，邊緣帶一點廣角變形。」</blockquote>
+    <ol class="next" data-toc="1"></ol>
+  </section>
+</div>

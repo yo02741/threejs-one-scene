@@ -133,3 +133,97 @@ ol.next li.done span { color: var(--sage); }
   html { scroll-behavior: auto; }
   section, #inset { transition: none; }
 }
+
+/* ---------- 章節導覽 ---------- */
+#nav {
+  position: fixed; z-index: 3; right: 10px; top: calc(var(--stage-h) + 8px);
+  display: flex; flex-direction: column; gap: 2px;
+  font: 11px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+#nav a { color: #5f6279; text-decoration: none; padding: 4px 5px; border-radius: 4px; }
+#nav a:hover, #nav a:focus-visible { color: var(--text); outline: none; }
+#nav a.on { color: var(--sage); }
+#nav:has(a:only-child) { display: none; }
+
+/* ---------- 舞台上的附加元件 ---------- */
+#hud2 {
+  position: absolute; top: 34px; left: 16px; display: none;
+  font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--sage);
+}
+#hud2.on { display: block; }
+#graph { position: absolute; left: 16px; bottom: 14px; width: 240px; height: 56px; display: none; }
+#graph.on { display: block; }
+#split {
+  position: absolute; top: 0; bottom: 0; width: 28px; margin-left: -14px;
+  cursor: ew-resize; display: none; touch-action: none;
+}
+#split.on { display: block; }
+#split i { position: absolute; left: 13px; top: 0; bottom: 0; width: 2px; background: var(--sage); opacity: .8; }
+#split::before, #split::after {
+  position: absolute; top: 14px; font-size: 11px; color: var(--muted); letter-spacing: .08em; white-space: nowrap;
+}
+#split::before { content: "原圖"; right: 22px; }
+#split::after { content: "後製後"; left: 22px; }
+#split:focus-visible { outline: none; }
+#split:focus-visible i { opacity: 1; width: 3px; }
+#title {
+  position: absolute; right: 9%; top: 50%; transform: translateY(-50%);
+  font-size: clamp(22px, 4.2vw, 54px); color: #efece2; letter-spacing: .2em;
+  opacity: 0; transition: opacity 1.2s; pointer-events: none;
+}
+#title.on { opacity: 1; }
+#fallback {
+  position: absolute; inset: 0; display: none; flex-direction: column; gap: 14px;
+  align-items: center; justify-content: center; text-align: center;
+  background:
+    radial-gradient(circle at 34% 46%, rgba(236,220,174,.9) 0 5px, rgba(236,220,174,.18) 6px 60px, transparent 120px),
+    var(--ink);
+  font-size: clamp(22px, 4.2vw, 54px); color: #efece2; letter-spacing: .2em;
+}
+#fallback.on { display: flex; }
+#fallback small { font-size: 12px; letter-spacing: .08em; color: var(--muted); }
+#resume, #exitFinale {
+  position: absolute; left: 16px; bottom: 14px; font-size: 12px; padding: 4px 12px;
+  background: rgba(18,20,31,.8);
+}
+#exitFinale { left: auto; right: 16px; top: 14px; bottom: auto; }
+
+/* ---------- 文字欄的新零件 ---------- */
+details.more {
+  margin: 4px 0 20px; border: 1px dashed var(--line); border-radius: 6px; font-size: 15px; color: var(--muted);
+}
+details.more summary { cursor: pointer; padding: 10px 16px; color: var(--sage); font-size: 14px; }
+details.more > div { padding: 0 16px 6px; }
+details.more strong { color: var(--text); }
+.panel h3 { margin: 0 0 10px; font-size: 13px; font-weight: 400; color: #6d7089; letter-spacing: .08em; }
+.panel .note { font-size: 13px; color: #6d7089; margin: -4px 0 10px; }
+.panel .stat { font: 13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--star); margin: 0 0 10px; }
+input[type=color] {
+  width: 34px; height: 24px; padding: 0; border: 1px solid var(--line); border-radius: 4px; background: none; cursor: pointer;
+}
+.row.colors { gap: 10px; }
+.row.colors label { flex: 0 0 auto; }
+canvas.curve { display: block; width: 100%; height: 120px; margin-bottom: 12px; border-radius: 4px; background: var(--ink-2); }
+.checks { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+
+/* 跑道：一段很長的捲動距離，讓讀者慢慢捲、看相機動 */
+section[data-runway] { justify-content: flex-start; }
+.runway {
+  height: 160vh; margin-top: 12px; border-left: 1px dashed var(--line); padding-left: 16px;
+  background: repeating-linear-gradient(to bottom, transparent 0 58px, var(--line) 58px 59px) left / 8px 100% no-repeat;
+}
+.runway p {
+  position: sticky; top: calc(var(--stage-h) + 24px); margin: 0;
+  font: 13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--muted);
+}
+.runway p b { color: var(--star); font-weight: 400; }
+
+@media (min-width: 900px) {
+  #nav { top: 14px; right: auto; left: calc(var(--col) - 34px); }
+  .runway p { top: 45vh; }
+}
+
+/* ---------- 看成品：收起文字欄，舞台佔滿畫面 ---------- */
+body.finale main, body.finale #nav, body.finale #hud, body.finale #hud2, body.finale #graph { display: none; }
+body.finale #stage { left: 0; height: 100%; bottom: 0; border: 0; }
+@media (prefers-reduced-motion: reduce) { #title { transition: none; } }
