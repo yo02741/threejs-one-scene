@@ -117,19 +117,34 @@ export function createParticles(scene, renderer) {
       const th = r() * Math.PI * 2, y = r() * 2 - 1, s = Math.sqrt(1 - y * y), rad = 3.2 + Math.pow(r(), 0.7) * 11;
       data.push({
         x: Math.cos(th) * s * rad, y: y * rad * 0.7, z: Math.sin(th) * s * rad,
+        ox: 0, oy: 0, oz: 0, // 被游標推開的位移
         s: 0.03 + r() * 0.1, rx: (r() - 0.5) * 1.2, ry: (r() - 0.5) * 1.2, ph: r() * 6.28, sp: 0.3 + r() * 0.5,
       });
     }
   }
   const dummy = new Object3D();
   let time = 0, shownMinis = -1;
+  const ray = { on: false, o: [0, 0, 0], d: [0, 0, 1] }; // 游標射進場景的那條線
 
   function placeMinis(S) {
     const n = S.minis.count;
     for (let i = 0; i < n; i++) {
       const d = data[i];
+      // 小星到射線的距離；夠近就沿著「遠離射線」的方向推開（力道是負的就變成吸引）
+      let tx = 0, ty = 0, tz = 0;
+      if (ray.on && S.inter.push !== 0) {
+        const wx = d.x - ray.o[0], wy = d.y - ray.o[1], wz = d.z - ray.o[2];
+        const t = wx * ray.d[0] + wy * ray.d[1] + wz * ray.d[2];
+        const px = wx - ray.d[0] * t, py = wy - ray.d[1] * t, pz = wz - ray.d[2] * t;
+        const dist = Math.hypot(px, py, pz);
+        if (t > 0 && dist < S.inter.radius && dist > 1e-4) {
+          const f = S.inter.push * (1 - dist / S.inter.radius) ** 2 / dist;
+          tx = px * f; ty = py * f; tz = pz * f;
+        }
+      }
+      d.ox += (tx - d.ox) * 0.12; d.oy += (ty - d.oy) * 0.12; d.oz += (tz - d.oz) * 0.12;
       const o = S.minis.instanced ? dummy : (loose.children[i] || loose.add(new Mesh(miniGeo, miniMat)).children[i]);
-      o.position.set(d.x, d.y + Math.sin(time * d.sp + d.ph) * 0.18 * S.minis.float, d.z);
+      o.position.set(d.x + d.ox, d.y + d.oy + Math.sin(time * d.sp + d.ph) * 0.18 * S.minis.float, d.z + d.oz);
       o.rotation.set(time * d.rx, time * d.ry, 0);
       o.scale.setScalar(d.s);
       if (S.minis.instanced) { o.updateMatrix(); inst.setMatrixAt(i, o.matrix); }
@@ -140,6 +155,8 @@ export function createParticles(scene, renderer) {
   }
 
   return {
+    setRay(on, origin, dir) { ray.on = on; if (on) { origin.toArray(ray.o); dir.toArray(ray.d); } },
+
     apply(S) {
       const P = S.pts;
       points.visible = P.on;

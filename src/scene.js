@@ -2,7 +2,7 @@
 // 它不知道「章節」是什麼，只負責照著一份參數（見 params.js）長成對應的樣子。
 import {
   AxesHelper, BufferGeometry, CameraHelper, Color, Float32BufferAttribute, GridHelper, Line,
-  LineBasicMaterial, PerspectiveCamera, Raycaster, Scene, Vector2, Vector3, WebGLRenderer,
+  LineBasicMaterial, Mesh, MeshBasicMaterial, PerspectiveCamera, SphereGeometry, Raycaster, Scene, Vector2, Vector3, WebGLRenderer,
 } from 'three';
 import { defaults } from './params.js';
 import { smooth } from './motion.js';
@@ -70,6 +70,15 @@ export function createStage(canvas, stageEl, insetEl, reduced) {
   const v3 = new Vector3();
   let pixelRatio = 0;
 
+  /* ---------- 游標 ---------- */
+  // 游標在舞台上的位置：左 -1、右 1；下 -1、上 1
+  const pointer = { x: 0, y: 0, on: false, sx: 0, sy: 0, hit: null };
+  const ray = new Raycaster(), ndc = new Vector2(), right = new Vector3(), up = new Vector3(0, 1, 0);
+  // 鷹架：標出射線碰到星星的位置
+  const hitMark = new Mesh(new SphereGeometry(0.05, 12, 8), new MeshBasicMaterial({ color: 0x9fb8ad }));
+  hitMark.visible = false;
+  scene.add(hitMark);
+
   function applyAll() {
     grid.visible = axes.visible = S.scaffold;
     star.apply(S);
@@ -109,14 +118,40 @@ export function createStage(canvas, stageEl, insetEl, reduced) {
     cam.fov += (c.fov - cam.fov) * kc;
     cam.far = c.far;
     const after = cam.pos.lengthSq() + cam.target.lengthSq() * 3 + cam.fov * 7 + cam.far;
-    if (Math.abs(after - before) > 1e-7 || changed) {
+
+    // 視差：游標往哪邊，相機就往哪邊挪一點，但仍然看著同一個點（一樣用阻尼追）
+    const par = S.inter.parallax, kp = reduced ? 1 : 1 - Math.exp(-5 * dt);
+    const gx = pointer.on ? pointer.x * par : 0, gy = pointer.on ? pointer.y * par : 0;
+    const drift = Math.abs(gx - pointer.sx) + Math.abs(gy - pointer.sy) > 1e-4;
+    if (drift) { pointer.sx += (gx - pointer.sx) * kp; pointer.sy += (gy - pointer.sy) * kp; }
+
+    if (Math.abs(after - before) > 1e-7 || changed || drift) {
       camera.position.copy(cam.pos);
+      if (pointer.sx || pointer.sy) {
+        right.subVectors(cam.target, cam.pos).cross(up).normalize();
+        camera.position.addScaledVector(right, pointer.sx).addScaledVector(up, pointer.sy * 0.6);
+      }
       camera.lookAt(cam.target);
       camera.fov = cam.fov; camera.far = cam.far;
       camera.updateProjectionMatrix();
       if (S.inset) helper.update();
       changed = true;
     }
+
+    // 射線檢測：從相機朝游標的方向射一條線，看它碰到什麼
+    const I = S.inter, wants = pointer.on && (I.hover > 0 || I.mark || I.push !== 0);
+    let hit = null;
+    if (wants) {
+      ndc.set(pointer.x, pointer.y);
+      ray.setFromCamera(ndc, camera);
+      hit = ray.intersectObject(star.mesh)[0] || null;
+    }
+    particles.setRay(wants, ray.ray.origin, ray.ray.direction);
+    star.setHovered(!!hit);
+    hitMark.visible = !!hit && I.mark;
+    if (hit) hitMark.position.copy(hit.point);
+    if (!!hit !== !!pointer.hit) { canvas.style.cursor = hit ? 'pointer' : ''; changed = true; }
+    pointer.hit = hit;
 
     if (Math.min(window.devicePixelRatio || 1, S.pr) !== pixelRatio) { resize(); changed = true; }
     if (changed) applyAll();
@@ -164,11 +199,11 @@ export function createStage(canvas, stageEl, insetEl, reduced) {
   camera.lookAt(cam.target);
   applyAll();
 
-  const ray = new Raycaster(), ndc = new Vector2();
-
   return {
     S, renderer, scene, camera, star, render, resize, settle,
     setTarget(P) { T = P; },
+    setPointer(x, y, on) { pointer.x = x; pointer.y = y; pointer.on = on; },
+    get hovering() { return !!pointer.hit; },
     animate(dt) { star.animate(dt, S); particles.animate(dt, S); glow.animate(dt, S); post.tick(dt); },
     // 這個畫面座標有沒有點到星星
     hitsStar(clientX, clientY) {

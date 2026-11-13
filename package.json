@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vite build && node tests/run.cjs practice && node tests/run.cjs ch1",
+    "test:shots": "vite build && node tests/run.cjs shots"
   },
   "dependencies": {
     "three": "^0.187.0"

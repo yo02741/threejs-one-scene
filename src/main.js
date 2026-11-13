@@ -3,7 +3,7 @@ import './style.css';
 import { createStage } from './scene.js';
 import { watchSections } from './scroll.js';
 import { defaults } from './params.js';
-import { fillToc, buildNav } from './ui.js';
+import { fillToc, buildNav, buildGlossary } from './ui.js';
 import chapter01 from './chapters/01-camera.js';
 import chapter02 from './chapters/02-material.js';
 import chapter03 from './chapters/03-light.js';
@@ -13,10 +13,11 @@ import chapter06 from './chapters/06-particles.js';
 import chapter07 from './chapters/07-shader.js';
 import chapter08 from './chapters/08-post.js';
 import chapter09 from './chapters/09-restraint.js';
+import chapter10 from './chapters/10-interaction.js';
 import { EASE, clamp, lerp } from './motion.js';
 
 // 依閱讀順序排列；新章節加在後面
-const CHAPTERS = [chapter01, chapter02, chapter03, chapter04, chapter05, chapter06, chapter07, chapter08, chapter09];
+const CHAPTERS = [chapter01, chapter02, chapter03, chapter04, chapter05, chapter06, chapter07, chapter08, chapter09, chapter10];
 
 const $ = (id) => document.getElementById(id);
 const stageEl = $('stage'), hud = $('hud'), hud2 = $('hud2'), insetEl = $('inset');
@@ -24,6 +25,7 @@ const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches 
 
 $('book').innerHTML = CHAPTERS.map((c) => c.html).join('');
 fillToc();
+buildGlossary($('book'));
 const markNav = buildNav($('nav'), CHAPTERS.length);
 
 let stage;
@@ -139,6 +141,15 @@ function start() {
 
   window.addEventListener('resize', () => { if (stage.resize()) state.dirty = true; });
   stage.resize();
+
+  /* ---------- 游標位置（第 10 章起使用） ---------- */
+  const track = (e) => {
+    const r = stageEl.getBoundingClientRect();
+    stage.setPointer(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1, true);
+  };
+  stageEl.addEventListener('pointermove', track);
+  stageEl.addEventListener('pointerdown', track);
+  stageEl.addEventListener('pointerleave', () => stage.setPointer(0, 0, false));
 
   /* ---------- 後製前後對比的分割線 ---------- */
   const split = $('split');

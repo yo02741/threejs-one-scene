@@ -68,12 +68,12 @@ export function createStar(scene) {
   /* ---------- 動作 ---------- */
   const entrance = { t: 1, dur: 0.9, ease: 'back', over: 0.08 };
   const poke = { x: 0, v: 0, t: 1 };
-  let ph1 = 0, ph2 = 0;
+  let ph1 = 0, ph2 = 0, hover = 0, hovered = false;
 
   function layout(S) {
     const e = entrance.t >= 1 ? 1 : EASE[entrance.ease](entrance.t, entrance.over);
     const base = S.starScale * e;
-    const s = base * (1 + S.breath * Math.sin(ph2)) * (1 + poke.x);
+    const s = base * (1 + S.breath * Math.sin(ph2)) * (1 + poke.x) * (1 + hover);
     group.scale.setScalar(Math.max(s, 0.0001));
     group.visible = base > 0.002;
     group.position.y = S.floatAmp * Math.sin(ph1);
@@ -104,6 +104,7 @@ export function createStar(scene) {
       ph1 += dt * w;
       // 錯開時，呼吸用另一個互質的週期
       ph2 = S.sync ? ph1 : ph2 + dt * w * 1.618;
+      hover += ((hovered ? S.inter.hover : 0) - hover) * Math.min(1, dt * 10);
       if (entrance.t < 1) entrance.t = Math.min(1, entrance.t + dt / entrance.dur);
       if (S.poke === 'spring') stepSpring(poke, S.stiff, S.dampS, dt);
       else if (poke.t < 1) {
@@ -114,6 +115,7 @@ export function createStar(scene) {
       layout(S);
     },
 
+    setHovered(v) { hovered = v; },
     playEntrance(opts) { Object.assign(entrance, opts, { t: 0 }); },
     poke(S) {
       if (S.poke === 'spring') poke.v += 3.6;

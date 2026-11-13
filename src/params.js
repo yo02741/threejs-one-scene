@@ -58,6 +58,15 @@ export const defaults = () => ({
     exposure: 1, contrast: 1, sat: 1, cool: 0, warm: 0,
   },
 
+  /* ---- 第 10 章 ---- */
+  inter: {
+    parallax: 0,            // 游標視差的強度
+    hover: 0,               // 游標指到主星時放大多少
+    mark: false,            // 鷹架：標出射線碰到的位置
+    push: 0,                // 游標推開（正）或吸引（負）附近小星的力道
+    radius: 1.6,            // 影響的半徑
+  },
+
   /* ---- 第 9 章 ---- */
   pr: 2,                    // 像素比上限
   mul: 1,                   // 粒子數倍率

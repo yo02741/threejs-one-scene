@@ -1,0 +1,93 @@
+<div class="chapter" id="ch10">
+
+  <section data-chapter="10" data-step="0">
+    <p class="kicker"><span class="brand">ひとめぐり</span>　星空教本</p>
+    <h1>第十章<br>它知道你在</h1>
+    <p class="lead">成品做完了，但它是一段影片：不管你做什麼，它都照自己的劇本走。這一章讓它注意到你。結束時，游標移動、指到星星、掃過星群，畫面都會有回應。</p>
+    <p class="lead">這一章要用滑鼠。把游標移到舞台上再開始。</p>
+  </section>
+
+  <section data-chapter="10" data-step="1">
+    <p class="kicker">01　PARALLAX</p>
+    <h2>游標也是一個數字</h2>
+    <p>在舞台上慢慢移動游標，從左邊移到右邊。然後把「強度」拉到最大再移一次。</p>
+    <div class="panel">
+      <div class="row"><label>視差強度</label><input type="range" data-k="parallax" min="0" max="1.5" step="0.05"><output data-o="parallax"></output></div>
+    </div>
+    <pre><i>// 游標在畫面上的位置：最左 -1，最右 1</i>
+目標 = 游標.x * <b data-c="parallax"></b>;
+camera.position.x += (目標 - camera.position.x) * 0.08;
+camera.lookAt(主角);  <i>// 位置挪了，但還是看著同一個點</i></pre>
+    <p>第五章把捲動換算成一個 0 到 1 的數字。游標也一樣：它在畫面上的位置可以換算成 -1 到 1。把這個數字接到相機的位置上，相機就會跟著游標微微移動，近的東西動得多、遠的東西動得少。這個效果叫<strong>視差</strong>，它讓平面的螢幕突然有了深度。</p>
+    <p>注意第二行：又是阻尼。相機不是直接跳到目標，而是每一幀追上一小段。沒有它，畫面會跟著手的每一個小抖動晃。</p>
+    <p class="lead">視差要小。大到讓人注意到的時候，它就從「有深度」變成「畫面在晃」了。</p>
+  </section>
+
+  <section data-chapter="10" data-step="2">
+    <p class="kicker">02　RAYCAST · HOVER</p>
+    <h2>射一條線進去問</h2>
+    <p>把游標移到主星上，再移開。綠色的小點是游標「碰到」星星的位置。</p>
+    <div class="panel">
+      <p class="stat">游標現在指到：<span id="hitName">沒有東西</span></p>
+      <div class="row"><label>放大</label><input type="range" data-k="hover" min="0" max="0.5" step="0.01"><output data-o="hover"></output></div>
+      <label class="check"><input type="checkbox" data-k="mark"> 顯示碰到的位置</label>
+    </div>
+    <pre>raycaster.setFromCamera(游標, camera);          <i>// 從相機朝游標的方向射一條線</i>
+const hits = raycaster.intersectObject(star);   <i>// 這條線碰到星星了嗎</i>
+star.scale.setScalar(hits.length ? 1 + <b data-c="hover"></b> : 1);</pre>
+    <p>畫面是平的，場景是立體的。游標只知道自己在螢幕的哪一個像素，不知道那個像素後面是什麼。要知道「指到誰」，得從相機的位置朝游標的方向射一條線進場景，看它先碰到哪個物體。這叫<strong>射線檢測</strong>（raycast）。</p>
+    <p>游標停在物體上叫<strong>懸停</strong>（hover）。懸停時給一點回應，使用者就知道「這個可以點」。放大和縮回都是緩緩過去的，和視差一樣是用追的，不會瞬間跳。</p>
+    <p class="lead">手機沒有游標，所以沒有懸停。任何「只有懸停才看得到」的東西，手機使用者永遠看不到。</p>
+  </section>
+
+  <section data-chapter="10" data-step="3">
+    <p class="kicker">03　FIELD</p>
+    <h2>讓整片星群讓路</h2>
+    <p>用游標掃過主星旁邊的那些小星。然後把「力道」拉到負的，再掃一次。</p>
+    <div class="panel">
+      <div class="row"><label>力道</label><input type="range" data-k="push" min="-1.5" max="1.5" step="0.05"><output data-o="push"></output></div>
+      <div class="row"><label>影響半徑</label><input type="range" data-k="radius" min="0.5" max="5" step="0.1"><output data-o="radius"></output></div>
+      <p class="note">力道是正的：推開。負的：吸過來。</p>
+    </div>
+    <pre>for (const 小星 of 小星們) {
+  const 距離 = 小星到那條射線的距離;
+  if (距離 &lt; <b data-c="radius"></b>) 小星.位置 += 遠離射線的方向 * <b data-c="push"></b>;
+}</pre>
+    <p>同一條射線還能做別的事。這裡不問「碰到誰」，而是問每一顆小星「你離這條線多遠」。夠近的就被推開，越近推得越遠。游標就像一根看不見的棍子伸進星群裡。</p>
+    <p>這種「一個位置影響周圍一片」的做法，是很多互動效果的骨架：被游標撥開的草、跟著手指流動的粒子、靠近會亮起來的格子。</p>
+    <p class="lead">互動是加分，不是門檻。沒有人碰它的時候，畫面也必須是完整的。</p>
+  </section>
+
+  <section data-chapter="10" data-step="3.5">
+    <p class="kicker">練習</p>
+    <h2>反過來：照著描述調出來</h2>
+    <p>兩段描述，把畫面調成那個樣子。調完記得把游標移到舞台上試試看。</p>
+    <div class="panel">
+      <div class="row"><label>視差強度</label><input type="range" data-k="parallax" min="0" max="1.5" step="0.05"><output data-o="parallax"></output></div>
+      <div class="row"><label>放大</label><input type="range" data-k="hover" min="0" max="0.5" step="0.01"><output data-o="hover"></output></div>
+      <div class="row"><label>力道</label><input type="range" data-k="push" min="-1.5" max="1.5" step="0.05"><output data-o="push"></output></div>
+      <div class="row"><label>影響半徑</label><input type="range" data-k="radius" min="0.5" max="5" step="0.1"><output data-o="radius"></output></div>
+    </div>
+    <div class="panel" data-practice></div>
+  </section>
+
+  <section data-chapter="10" data-step="4">
+    <p class="kicker">04　怎麼說</p>
+    <h2>這一章給你的詞彙</h2>
+    <p>綠色的小點拆了。定下來的是：很輕的視差；游標指到主星時它微微放大；掃過小星時它們輕輕讓開。</p>
+    <dl>
+      <dt>視差</dt><dd>視角移動時，近的東西動得多、遠的動得少。</dd>
+      <dt>懸停</dt><dd>游標停在物體上。只有滑鼠有，觸控沒有。</dd>
+      <dt>射線檢測</dt><dd>從相機朝游標射一條線，找出它碰到的物體。</dd>
+      <dt>回饋</dt><dd>使用者做了動作之後，畫面給的回應。</dd>
+      <dt>影響範圍</dt><dd>一個位置能影響到多遠的東西。</dd>
+    </dl>
+    <p>同一個需求，從模糊到精確：</p>
+    <blockquote>✕　「要有互動感。」</blockquote>
+    <blockquote>○　「相機跟著游標做很輕微的視差，帶阻尼。游標懸停在主星上時緩緩放大 8%。游標附近 1.6 單位內的小星會被輕輕推開。手機上這些都不做，畫面照常。」</blockquote>
+    <p>成品現在會回應你了。再播一次，這次記得動一動游標。</p>
+    <div class="panel"><div class="btns"><button type="button" id="watch2">看成品</button></div></div>
+    <ol class="next" data-toc="10"></ol>
+  </section>
+
+</div>

@@ -10,8 +10,12 @@ const TITLES = [
   'Shader 入門',
   '後製',
   '克制與效能',
+  '互動：讓它回應你',
+  '選修：把模型請進場景',
+  '後記：用 TresJS 重寫一次',
 ];
-const pad = (n) => String(n).padStart(2, '0');
+const LABELS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '選修', '後記'];
+const pad = (n) => LABELS[n - 1];
 
 // <ol class="next" data-toc="3"> → 九章目錄，前三章標成完成
 export function fillToc() {
@@ -24,7 +28,8 @@ export function fillToc() {
 
 export function buildNav(nav, count) {
   nav.innerHTML = TITLES.slice(0, count).map((t, i) =>
-    `<a href="#ch${i + 1}" title="${t}">${pad(i + 1)}</a>`).join('');
+    `<a href="#ch${i + 1}" title="${t}">${pad(i + 1).slice(0, 2)}</a>`).join('')
+    + '<a href="#glossary" title="詞彙總表">詞</a>';
   return (idx) => {
     nav.querySelectorAll('a').forEach((a, i) => a.classList.toggle('on', i === idx));
   };
@@ -140,6 +145,56 @@ export function bindChapter(root, local, ctx, opts = {}) {
 
   update();
   return { sync, update };
+}
+
+// 詞彙總表：收集每一章「怎麼說」裡的詞，按章排列，每個詞連回它第一次出現的那一段
+export function buildGlossary(book) {
+  const groups = [];
+  book.querySelectorAll('.chapter').forEach((ch, ci) => {
+    const dl = ch.querySelector('dl');
+    if (!dl) return;
+    const strongs = Array.from(ch.querySelectorAll('section strong'));
+    const items = Array.from(dl.querySelectorAll('dt')).map((dt) => {
+      const names = dt.textContent.split('／');
+      // 找這個詞在本章第一次以粗體出現的段落；找不到就連到詞彙表所在的那一段
+      const low = (t) => t.toLowerCase();
+      const hit = strongs.find((s) => names.some((n) => low(s.textContent).includes(low(n)) || low(n).includes(low(s.textContent))));
+      const sec = (hit || dl).closest('section');
+      if (!sec.id) sec.id = `${ch.id}-s${sec.dataset.step.replace('.', '_')}`;
+      return `<div class="term"><a href="#${sec.id}">${dt.textContent}</a><span>${dt.nextElementSibling.textContent}</span></div>`;
+    });
+    groups.push(`<h3>${pad(ci + 1)}　${TITLES[ci]}</h3>${items.join('')}`);
+  });
+  const wrap = document.createElement('div');
+  wrap.className = 'chapter';
+  wrap.id = 'glossary';
+  wrap.innerHTML = `<section class="appendix">
+    <p class="kicker">附錄</p>
+    <h2>詞彙總表</h2>
+    <p class="lead">每一章「怎麼說」裡的詞都在這裡。點一個詞，會回到它第一次出現的那一段。</p>
+    <input type="search" placeholder="找一個詞，例如：阻尼" aria-label="搜尋詞彙">
+    <div class="terms">${groups.join('')}</div>
+    <p class="hint none" hidden>沒有符合的詞。</p>
+  </section>`;
+  book.appendChild(wrap);
+
+  const input = wrap.querySelector('input'), none = wrap.querySelector('.none');
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    let shown = 0;
+    wrap.querySelectorAll('.term').forEach((t) => {
+      const on = !q || t.textContent.toLowerCase().includes(q);
+      t.hidden = !on;
+      if (on) shown++;
+    });
+    // 整組都被篩掉的章節標題也收起來
+    wrap.querySelectorAll('h3').forEach((h) => {
+      let el = h.nextElementSibling, any = false;
+      while (el && el.tagName !== 'H3') { if (!el.hidden) any = true; el = el.nextElementSibling; }
+      h.hidden = !any;
+    });
+    none.hidden = shown > 0;
+  });
 }
 
 // 把數值換成詞：pick(0.3, [0.25, '光滑'], [0.6, '半霧面'], '霧面') → '半霧面'
