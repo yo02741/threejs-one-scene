@@ -1,0 +1,99 @@
+<div class="chapter" id="ch4">
+
+  <section data-chapter="04" data-step="0">
+    <p class="kicker"><span class="brand">ひとめぐり</span>　星空教本</p>
+    <h1>第四章<br>有重量的動作</h1>
+    <p class="lead">星星現在只會一件事：用固定的速度轉。這一章結束時，它的出場、漂浮、被戳一下的反應，都會像一個有重量的東西。</p>
+    <p class="lead">這一章沒有新的物件。加進來的全部是「時間」。</p>
+  </section>
+
+  <section data-chapter="04" data-step="1">
+    <p class="kicker">01　EASING</p>
+    <h2>同樣的時間，不同的走法</h2>
+    <p>按「重播出場」，然後換一條曲線再按一次。四條都試試看。</p>
+    <div class="panel">
+      <canvas class="curve" id="easeCurve"></canvas>
+      <div class="btns">
+        <button type="button" data-k="ease" data-v="linear">等速</button>
+        <button type="button" data-k="ease" data-v="in">緩入</button>
+        <button type="button" data-k="ease" data-v="out">緩出</button>
+        <button type="button" data-k="ease" data-v="inOut">緩入緩出</button>
+      </div>
+      <div class="row"><label>時長</label><input type="range" data-k="dur" min="0.2" max="3" step="0.1"><output data-o="dur" data-u=" 秒"></output></div>
+      <div class="btns"><button type="button" id="replay">重播出場</button></div>
+    </div>
+    <pre>const t = 經過的時間 / <b data-c="dur"></b>;   <i>// 0 → 1</i>
+const k = <b data-ease></b>(t);         <i>// 曲線在這一行</i>
+star.scale.setScalar(k);</pre>
+    <p>圖的橫軸是時間，縱軸是「完成了多少」。四條線的起點、終點、花的時間都一樣，差別只在中間怎麼走。這條線叫<strong>緩動曲線</strong>。<strong>緩出</strong>是一開始快、最後慢下來；<strong>緩入</strong>相反。</p>
+    <p>「快」和「慢」多半不是速度的問題。同樣 0.9 秒，緩出感覺俐落，緩入感覺遲鈍，等速感覺像機器。</p>
+    <p class="lead">東西出現用緩出，離開用緩入，在畫面裡移動用緩入緩出。這條經驗法則能解決大半的情況。</p>
+  </section>
+
+  <section data-chapter="04" data-step="2">
+    <p class="kicker">02　SPRING</p>
+    <h2>不問幾秒到，只問多硬多黏</h2>
+    <p>連續快速地按「戳一下」（也可以直接點舞台上的星星）。然後切到「緩動」，再連按一次。</p>
+    <div class="panel">
+      <canvas class="curve" id="springCurve"></canvas>
+      <div class="btns">
+        <button type="button" data-k="mode" data-v="spring">彈簧</button>
+        <button type="button" data-k="mode" data-v="tween">緩動</button>
+        <button type="button" id="poke">戳一下</button>
+      </div>
+      <div class="row"><label>剛性</label><input type="range" data-k="stiff" min="20" max="600" step="10"><output data-o="stiff"></output></div>
+      <div class="row"><label>阻尼</label><input type="range" data-k="dampS" min="1" max="40" step="1"><output data-o="dampS"></output></div>
+    </div>
+    <pre>速度 += (-<b data-c="stiff"></b> * 位移 - <b data-c="dampS"></b> * 速度) * dt;
+位移 += 速度 * dt;
+star.scale.setScalar(1 + 位移);</pre>
+    <p><strong>彈簧</strong>是另一種動法。它不規定幾秒走完，只規定兩件事：<strong>剛性</strong>（離目標越遠，拉回來的力越大）和<strong>阻尼</strong>（動得越快，煞車越用力）。阻尼小，就會衝過頭再彈回來，這叫<strong>過衝</strong>。</p>
+    <p>連按的時候差別就出來了。彈簧每戳一下都接在原本的動作上；緩動只能從頭播，所以會跳一下。</p>
+    <p class="lead">會被使用者打斷的動作，幾乎都該用彈簧。照劇本走的動作，用緩動。</p>
+    <details class="more">
+      <summary>補充：GSAP 是什麼</summary>
+      <div>
+        <p>之後看別人的專案，很常會看到 <strong>GSAP</strong>。它是網頁上最常用的動畫函式庫，寫起來像這樣：<code>gsap.to(star.scale, { x: 1, duration: 0.9, ease: "power3.out" })</code>。</p>
+        <p>它幫你管的，就是這一章的東西：時長、緩動曲線，還有多段動畫的先後順序。你在上一段手寫的三行，是它的核心。</p>
+        <p>這本書沒有用它，因為這裡要看的正是那三行。實際做專案時，動畫一多，用它會省很多事。</p>
+      </div>
+    </details>
+  </section>
+
+  <section data-chapter="04" data-step="3">
+    <p class="kicker">03　IDLE</p>
+    <h2>沒人碰它的時候</h2>
+    <p>先把「漂浮幅度」拉大看清楚它在做什麼，再慢慢拉回來，停在你幾乎看不出來的地方。</p>
+    <div class="panel">
+      <div class="row"><label>漂浮幅度</label><input type="range" data-k="floatAmp" min="0" max="0.6" step="0.01"><output data-o="floatAmp"></output></div>
+      <div class="row"><label>漂浮週期</label><input type="range" data-k="period" min="1" max="12" step="0.5"><output data-o="period" data-u=" 秒"></output></div>
+      <div class="row"><label>呼吸幅度</label><input type="range" data-k="breath" min="0" max="0.2" step="0.005"><output data-o="breath"></output></div>
+      <div class="row"><label>自轉速度</label><input type="range" data-k="spin" min="0" max="2" step="0.05"><output data-o="spin"></output></div>
+      <label class="check"><input type="checkbox" data-k="sync"> 漂浮和呼吸用同一個節拍</label>
+    </div>
+    <pre>star.position.y = <b data-c="floatAmp"></b> * Math.sin(時間 * 2π / <b data-c="period"></b>);</pre>
+    <p>一個來回花的時間叫<strong>週期</strong>，來回的距離叫<strong>幅度</strong>。漂浮、呼吸（微微放大縮小）、自轉，是三個各自循環的動作。</p>
+    <p>勾選「同一個節拍」，星星會像節拍器一樣規律。取消勾選，三個動作的週期<strong>錯開</strong>，組合起來很久才重複一次，看起來就像活的。</p>
+    <p class="lead">好的待機動作幾乎看不見。拿掉它，畫面卻馬上變死。</p>
+  </section>
+
+  <section data-chapter="04" data-step="4">
+    <p class="kicker">04　怎麼說</p>
+    <h2>這一章給你的詞彙</h2>
+    <p>定下來的是：出場 0.9 秒、緩出、尾巴衝過頭一點點；之後 7 秒一個週期緩緩漂浮，自轉放慢一半；被點到時用彈簧彈一下。</p>
+    <div class="panel"><div class="btns"><button type="button" id="replayFinal">重播定稿的出場</button></div></div>
+    <dl>
+      <dt>緩入／緩出／緩入緩出</dt><dd>動作的開頭慢、結尾慢，或兩頭都慢。</dd>
+      <dt>時長</dt><dd>一段動作花幾秒。介面上的動作多半在 0.2 到 1 秒之間。</dd>
+      <dt>過衝</dt><dd>衝過目標再回來。一點點是活潑，太多是廉價。</dd>
+      <dt>彈性／阻尼</dt><dd>彈簧的兩個旋鈕：多硬、多黏。</dd>
+      <dt>週期／幅度</dt><dd>循環動作多久一次、動多遠。</dd>
+      <dt>錯開</dt><dd>讓幾個動作不要同時開始、不要同一個節拍。</dd>
+    </dl>
+    <p>同一個需求，從模糊到精確：</p>
+    <blockquote>✕　「動得自然一點。」</blockquote>
+    <blockquote>○　「出場 0.9 秒，緩出，尾巴帶一點點過衝；之後 7 秒一個循環上下漂浮，幅度很小，幾乎察覺不到。」</blockquote>
+    <ol class="next" data-toc="4"></ol>
+  </section>
+
+</div>

@@ -5,9 +5,13 @@ import { watchSections } from './scroll.js';
 import { defaults } from './params.js';
 import { fillToc, buildNav } from './ui.js';
 import chapter01 from './chapters/01-camera.js';
+import chapter02 from './chapters/02-material.js';
+import chapter03 from './chapters/03-light.js';
+import chapter04 from './chapters/04-motion.js';
+import chapter05 from './chapters/05-scroll.js';
 
 // 依閱讀順序排列；新章節加在後面
-const CHAPTERS = [chapter01];
+const CHAPTERS = [chapter01, chapter02, chapter03, chapter04, chapter05];
 
 const $ = (id) => document.getElementById(id);
 const stageEl = $('stage'), hud = $('hud'), hud2 = $('hud2'), insetEl = $('inset');

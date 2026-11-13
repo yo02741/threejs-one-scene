@@ -1,0 +1,94 @@
+<div class="chapter" id="ch2">
+
+  <section data-chapter="02" data-step="0">
+    <p class="kicker"><span class="brand">ひとめぐり</span>　星空教本</p>
+    <h1>第二章<br>摸得到的表面</h1>
+    <p class="lead">上一章的星星是一張平平的色紙。這一章結束時，它會變成一顆摸得出表面的東西：有稜角、有霧面、自己帶一點微光。</p>
+    <p class="lead">相機先靠近一點，等一下要看的是表面。</p>
+  </section>
+
+  <section data-chapter="02" data-step="1">
+    <p class="kicker">01　FACES</p>
+    <h2>圓的東西，其實不存在</h2>
+    <p>把滑桿慢慢往右拉，看星星的輪廓。</p>
+    <pre>const shape = new THREE.IcosahedronGeometry(1, <b data-c="detail"></b>);
+<i>// 現在是 <span data-tri></span> 個三角形</i></pre>
+    <div class="panel">
+      <div class="row"><label>細分</label><input type="range" data-k="detail" min="0" max="5" step="1"><output data-o="detail"></output></div>
+      <label class="check"><input type="checkbox" data-k="wire"> 顯示線框</label>
+    </div>
+    <p>3D 裡的每個形狀都是三角形拼出來的。三角形的數量叫<strong>面數</strong>：越多越接近圓，也越花力氣畫。把<strong>線框</strong>（只畫三角形的邊）關掉再拉一次，你會發現自己其實分不太出 500 和 720。</p>
+    <p class="lead">面數是細緻和效能之間的第一個取捨。之後覺得「不夠圓」的時候，先問：需要多圓？</p>
+  </section>
+
+  <section data-chapter="02" data-step="2">
+    <p class="kicker">02　MATERIAL</p>
+    <h2>換一種表面，然後它黑掉了</h2>
+    <p>到目前為止，星星的材質只有一個顏色，有沒有光都一樣亮。按下 Standard，換成一種會回應光的材質。</p>
+    <div class="panel">
+      <div class="btns">
+        <button type="button" data-k="mat" data-v="basic">Basic</button>
+        <button type="button" data-k="mat" data-v="standard">Standard</button>
+      </div>
+      <label class="check"><input type="checkbox" data-k="work"> 打開工作燈</label>
+    </div>
+    <pre>const surface = new THREE.MeshStandardMaterial({ color: 0xecdcae });</pre>
+    <p>全黑不是壞掉。<strong>Standard 材質</strong>描述的是「這個表面怎麼反光」，而場景裡還沒有任何光。現在把工作燈打開。</p>
+    <p>這盞燈是借來的。光是下一章的主題，這裡先借一盞固定的燈、加一個中性的攝影棚環境，讓表面有東西可以反應。</p>
+    <p class="lead">材質不是顏色，是表面對光的反應。沒有光，再好的材質也是黑的。</p>
+  </section>
+
+  <section data-chapter="02" data-step="3">
+    <p class="kicker">03　ROUGHNESS · METALNESS</p>
+    <h2>兩個數字，決定它像什麼</h2>
+    <p>這一段已經幫你換好材質、開好燈。先把四顆按鈕各按一次。</p>
+    <div class="panel">
+      <div class="btns">
+        <button type="button" data-set='{"rough":0.9,"metal":0}'>陶瓷</button>
+        <button type="button" data-set='{"rough":0.35,"metal":0}'>塑膠</button>
+        <button type="button" data-set='{"rough":0.6,"metal":1}'>霧面金屬</button>
+        <button type="button" data-set='{"rough":0.12,"metal":1}'>拋光金屬</button>
+      </div>
+      <div class="row"><label>粗糙度</label><input type="range" data-k="rough" min="0" max="1" step="0.01"><output data-o="rough"></output></div>
+      <div class="row"><label>金屬感</label><input type="range" data-k="metal" min="0" max="1" step="0.01"><output data-o="metal"></output></div>
+    </div>
+    <pre>surface.roughness = <b data-c="rough"></b>;
+surface.metalness = <b data-c="metal"></b>;</pre>
+    <p><strong>粗糙度</strong>是表面有多霧：0 像鏡子，1 像粉筆。<strong>金屬感</strong>是它算不算金屬：0 是塑膠、陶瓷這類東西，1 是金屬。金屬幾乎不顯示自己的底色，而是映出周圍的環境，所以拋光金屬的星星上看得到攝影棚的影子。</p>
+    <p class="lead">大部分「質感」的需求，講的其實都是這兩個數字。</p>
+  </section>
+
+  <section data-chapter="02" data-step="4">
+    <p class="kicker">04　SHADING</p>
+    <h2>稜角是選出來的</h2>
+    <p>打開「平面著色」，再關掉，來回幾次。三角形一個都沒有變。</p>
+    <div class="panel">
+      <label class="check"><input type="checkbox" data-k="flat"> 平面著色</label>
+      <label class="check"><input type="checkbox" data-k="normals"> 顯示法線</label>
+      <div class="row"><label>細分</label><input type="range" data-k="detail" min="0" max="5" step="1"><output data-o="detail"></output></div>
+    </div>
+    <pre>surface.flatShading = <b data-c="flat"></b>;</pre>
+    <p>那些淺色的小箭頭叫<strong>法線</strong>，代表表面「朝向哪裡」，光影就是照它算的。<strong>平面著色</strong>時每個面只有一個朝向，面和面之間有明確的折線。<strong>平滑著色</strong>時朝向記在頂點上，在面的內部慢慢過渡，光影就連成一片。</p>
+    <p>所以「看起來圓滑」和「面數多」不是同一件事。把細分調到 1、關掉平面著色：只有 80 個面，看起來卻比 320 個面的平面著色還圓。</p>
+    <p class="lead">不過輪廓騙不了人。看星星的邊緣，它還是多邊形。</p>
+  </section>
+
+  <section data-chapter="02" data-step="5">
+    <p class="kicker">05　怎麼說</p>
+    <h2>這一章給你的詞彙</h2>
+    <p>旋鈕收起來了，線框也拆了。這是這一章定下來的樣子：低面數、保留稜角的霧面星，像手摺出來的，自己帶一點暖色的微光。工作燈還亮著，下一章再還。</p>
+    <dl>
+      <dt>面數／低面數</dt><dd>三角形的數量。低面數不是偷懶，可以是一種風格。</dd>
+      <dt>線框</dt><dd>只畫三角形的邊。用來檢查形狀，不是成品。</dd>
+      <dt>粗糙度</dt><dd>表面有多霧。越低越像鏡子。</dd>
+      <dt>金屬感</dt><dd>是不是金屬。金屬映出環境，非金屬顯示自己的顏色。</dd>
+      <dt>平面著色／平滑著色</dt><dd>要不要看到面和面之間的折線。和面數無關。</dd>
+      <dt>自發光</dt><dd>不靠光也看得到的顏色。很弱的自發光能讓暗面不會死黑。</dd>
+    </dl>
+    <p>同一個需求，從模糊到精確：</p>
+    <blockquote>✕　「星星要有質感一點。」</blockquote>
+    <blockquote>○　「低面數、保留稜角，表面是不反光的霧面，粗糙度 0.4 到 0.5，不要金屬感，本身帶一點暖色的微光。」</blockquote>
+    <ol class="next" data-toc="2"></ol>
+  </section>
+
+</div>

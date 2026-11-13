@@ -27,13 +27,13 @@ export function createLights(scene, renderer) {
   const fill = new DirectionalLight(0xffffff, 0);
   fill.position.set(4.5, 0.3, 3);
   const rim = new DirectionalLight(0xffffff, 0);
-  rim.position.set(0.6, 3, -5);
+  rim.position.set(1.2, 1.4, -5);
   const hemi = new HemisphereLight(0xbfd0ff, 0x1b1e2e, 0);
   scene.add(work, key, fill, rim, hemi);
 
   // 鷹架：光源位置的標記（一顆小球，加一條指向星星的線）
   const marks = new Group();
-  const ball = new SphereGeometry(0.11, 12, 8);
+  const ball = new SphereGeometry(0.06, 12, 8);
   const mark = (light) => {
     const g = new Group();
     const mat = new MeshBasicMaterial({ color: 0xffffff });
@@ -44,7 +44,7 @@ export function createLights(scene, renderer) {
     marks.add(g);
     return () => {
       // 標記放在比光源近一點的地方，才進得了畫面
-      const p = light.position.clone().setLength(2.6);
+      const p = light.position.clone().setLength(1.9);
       dot.position.copy(p);
       line.geometry.getAttribute('position').setXYZ(0, p.x, p.y, p.z);
       line.geometry.getAttribute('position').needsUpdate = true;
@@ -69,7 +69,7 @@ export function createLights(scene, renderer) {
   return {
     marks,
     apply(S) {
-      work.intensity = S.work * 2.4;
+      work.intensity = S.work * 1.5;
       scene.environmentIntensity = S.env;
 
       const k = S.key, r = 6, ce = Math.cos(k.el * rad);

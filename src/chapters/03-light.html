@@ -1,0 +1,115 @@
+<div class="chapter" id="ch3">
+
+  <section data-chapter="03" data-step="0">
+    <p class="kicker"><span class="brand">ひとめぐり</span>　星空教本</p>
+    <h1>第三章<br>光從哪裡來</h1>
+    <p class="lead">上一章借了一盞工作燈。這一章把它還回去，換成三盞自己擺的燈。結束時，星星會有亮面、暗面，和一道被勾出來的邊。</p>
+    <div class="panel">
+      <label class="check"><input type="checkbox" data-k="work"> 工作燈</label>
+    </div>
+    <p class="lead">先把工作燈關掉。剩下的那一點點亮，是星星自己的自發光。</p>
+  </section>
+
+  <section data-chapter="03" data-step="1">
+    <p class="kicker">01　KEY LIGHT</p>
+    <h2>一盞燈，決定哪裡亮</h2>
+    <p>現在場景裡有一盞你的燈了。先把「方位」從左拉到右，讓燈繞星星走一圈。</p>
+    <div class="panel">
+      <div class="row"><label>方位</label><input type="range" data-k="az" min="-180" max="180" step="1"><output data-o="az" data-u="°"></output></div>
+      <div class="row"><label>高度</label><input type="range" data-k="el" min="-30" max="85" step="1"><output data-o="el" data-u="°"></output></div>
+      <div class="row"><label>強度</label><input type="range" data-k="int" min="0" max="8" step="0.1"><output data-o="int"></output></div>
+      <label class="check"><input type="checkbox" data-k="marks"> 顯示光源位置</label>
+    </div>
+    <pre>const key = new THREE.DirectionalLight(0xffffff, <b data-c="int"></b>);
+key.position.set(...);  <i>// 方位 <b data-c="az"></b>°、高度 <b data-c="el"></b>°</i>
+scene.add(key);</pre>
+    <p>這盞叫<strong>主光</strong>：畫面裡最主要的那盞燈，亮面和暗面的分界由它決定。舞台上的小球是它的位置，線指向星星。</p>
+    <p>再做一個實驗。把方位轉到 0（燈在相機正後方），強度拉到最大：很亮，但是平的。然後強度拉回 2.5，方位轉到 70：暗下來了，體積卻出來了。</p>
+    <p class="lead">光打在哪裡，比光有多亮重要。</p>
+  </section>
+
+  <section data-chapter="03" data-step="2">
+    <p class="kicker">02　THREE-POINT</p>
+    <h2>三盞燈，各有工作</h2>
+    <p>先按四顆按鈕比較，再自己開關每一盞。</p>
+    <div class="panel">
+      <div class="btns">
+        <button type="button" data-set='{"keyOn":true,"fillOn":true,"fillInt":0.65,"rimOn":true,"rimInt":3}'>三點打光</button>
+        <button type="button" data-set='{"keyOn":true,"fillOn":true,"fillInt":2.4,"rimOn":false}'>平光</button>
+        <button type="button" data-set='{"keyOn":true,"fillOn":false,"rimOn":true,"rimInt":4}'>戲劇</button>
+        <button type="button" data-set='{"keyOn":false,"fillOn":false,"rimOn":true,"rimInt":6}'>剪影</button>
+      </div>
+      <label class="check"><input type="checkbox" data-k="keyOn"> 主光</label>
+      <label class="check"><input type="checkbox" data-k="fillOn"> 補光</label>
+      <div class="row"><label>補光強度</label><input type="range" data-k="fillInt" min="0" max="4" step="0.05"><output data-o="fillInt"></output></div>
+      <label class="check"><input type="checkbox" data-k="rimOn"> 輪廓光</label>
+      <div class="row"><label>輪廓光強度</label><input type="range" data-k="rimInt" min="0" max="8" step="0.1"><output data-o="rimInt"></output></div>
+    </div>
+    <pre>scene.add(key);   <i>// 主光：定出形狀</i>
+scene.add(fill);  <i>// 補光：強度 <b data-c="fillInt"></b>，救回暗面</i>
+scene.add(rim);   <i>// 輪廓光：強度 <b data-c="rimInt"></b>，從背後勾邊</i></pre>
+    <p><strong>補光</strong>放在主光的另一側，比主光弱，工作是讓暗面不要全黑。<strong>輪廓光</strong>放在物體背後，只照到邊緣，把它從背景裡切出來。</p>
+    <p>「平光」把補光開得和主光差不多亮：什麼都看得清楚，也什麼都不立體。主光和補光的強弱比例叫<strong>光比</strong>，比例越懸殊越戲劇。</p>
+    <p class="lead">「立體感」是亮和暗的比例，不是亮度。</p>
+  </section>
+
+  <section data-chapter="03" data-step="3">
+    <p class="kicker">03　COLOR TEMPERATURE</p>
+    <h2>光有顏色</h2>
+    <p>把主光往暖的方向拉，補光往冷的方向拉。</p>
+    <div class="panel">
+      <div class="row"><label>主光色溫</label><input type="range" data-k="keyTemp" min="-1" max="1" step="0.05"><output data-o="keyTemp"></output></div>
+      <div class="row"><label>補光色溫</label><input type="range" data-k="fillTemp" min="-1" max="1" step="0.05"><output data-o="fillTemp"></output></div>
+      <div class="row"><label>環境光</label><input type="range" data-k="hemi" min="0" max="1.5" step="0.05"><output data-o="hemi"></output></div>
+      <p class="note">色溫：-1 是冷的藍白，0 是白，1 是暖的橘白。</p>
+    </div>
+    <pre>key.color.set(暖白);    <i>// 色溫 <b data-c="keyTemp"></b></i>
+fill.color.set(冷白);   <i>// 色溫 <b data-c="fillTemp"></b></i>
+scene.add(new THREE.HemisphereLight(天空色, 地面色, <b data-c="hemi"></b>));</pre>
+    <p><strong>色溫</strong>講的是光偏暖還是偏冷。暖的主光配冷的補光是最常見的搭法：亮面像被太陽照到，暗面像映著天空。反過來配，就變成夜晚、月光。</p>
+    <p><strong>環境光</strong>沒有方向，從四面八方均勻地來，把整體墊亮一點。開太多，辛苦擺出來的明暗就被沖平了。</p>
+    <p class="lead">色溫是調整畫面情緒最便宜的旋鈕：一行程式，不花任何效能。</p>
+  </section>
+
+  <section data-chapter="03" data-step="4">
+    <p class="kicker">04　SHADOW</p>
+    <h2>影子要另外算</h2>
+    <p>星星浮在太空裡，沒有東西可以接影子。這裡臨時放一塊地面。光打著、星星在、地面也在，但是沒有影子。把「投影」打開。</p>
+    <div class="panel">
+      <label class="check"><input type="checkbox" data-k="shadow"> 投影</label>
+      <div class="row"><label>柔和度</label><input type="range" data-k="soft" min="0" max="8" step="0.5"><output data-o="soft"></output></div>
+      <div class="btns">
+        <button type="button" data-k="res" data-v="128">128</button>
+        <button type="button" data-k="res" data-v="512">512</button>
+        <button type="button" data-k="res" data-v="1024">1024</button>
+        <button type="button" data-k="res" data-v="2048">2048</button>
+      </div>
+      <p class="note">影子的解析度。先選 128 看看。</p>
+    </div>
+    <pre>key.castShadow = <b data-c="shadow"></b>;         <i>// 光同意</i>
+star.castShadow = true;        <i>// 投影的物體同意</i>
+ground.receiveShadow = true;   <i>// 接影子的表面同意</i>
+key.shadow.mapSize.set(<b data-c="res"></b>, <b data-c="res"></b>);</pre>
+    <p><strong>投影</strong>不是光附贈的。它的做法是：站在光的位置，把整個場景再拍一次，記下「光看得到哪裡」；看不到的地方就是影子。所以開一盞會投影的燈，場景就要多畫一遍。解析度選 128 時邊緣的鋸齒，就是那張圖太小的結果。</p>
+    <p class="lead">影子要光、物體、表面三方都同意，而且很貴。需要的時候才開。</p>
+  </section>
+
+  <section data-chapter="03" data-step="5">
+    <p class="kicker">05　怎麼說</p>
+    <h2>這一章給你的詞彙</h2>
+    <p>地面拆了，光源的標記也拆了。定下來的是：左上前方一盞暖白的主光，右邊一盞很弱的冷色補光，背後一道輪廓光。成品裡沒有地面，所以不投影；但星星自己身上的暗面留著。</p>
+    <dl>
+      <dt>主光／補光／輪廓光</dt><dd>定形、救暗部、勾邊。三盞燈三種工作。</dd>
+      <dt>光比</dt><dd>主光和補光的強弱比例。差越多越戲劇，越接近越平。</dd>
+      <dt>色溫</dt><dd>光偏暖或偏冷。暖主光配冷補光是白天，反過來是夜晚。</dd>
+      <dt>環境光</dt><dd>沒有方向的光，把整體墊亮。</dd>
+      <dt>亮面／暗面</dt><dd>物體自己身上受光和背光的部分。不需要投影也有。</dd>
+      <dt>投影</dt><dd>物體落在別的表面上的影子。要另外算，而且貴。</dd>
+    </dl>
+    <p>同一個需求，從模糊到精確：</p>
+    <blockquote>✕　「打亮一點、立體一點。」</blockquote>
+    <blockquote>○　「主光從左上 45 度打，暖白色；補光只要主光的四分之一、偏冷；背後加一道輪廓光把邊緣勾出來。不需要投影。」</blockquote>
+    <ol class="next" data-toc="3"></ol>
+  </section>
+
+</div>

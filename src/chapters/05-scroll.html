@@ -1,0 +1,119 @@
+<div class="chapter" id="ch5">
+
+  <section data-chapter="05" data-step="0">
+    <p class="kicker"><span class="brand">ひとめぐり</span>　星空教本</p>
+    <h1>第五章<br>捲動就是運鏡</h1>
+    <p class="lead">到目前為止，捲動只做一件事：決定你在讀第幾段。這一章結束時，你的滾輪就是攝影機的軌道。</p>
+    <p class="lead">接下來幾段的後面都接著一條長長的空白，那是給相機走的路。調好旋鈕，然後慢慢往下捲。</p>
+  </section>
+
+  <section data-chapter="05" data-step="1" data-runway>
+    <p class="kicker">01　PROGRESS</p>
+    <h2>捲動是一個 0 到 1 的數字</h2>
+    <p>往下捲，看程式碼裡的「進度」和舞台。然後往回捲。</p>
+    <pre>const 進度 = 這一段捲了多少;   <i>// 現在是 <b data-p></b></i>
+camera.position.z = lerp(<b data-c="far"></b>, <b data-c="near"></b>, 進度);</pre>
+    <div class="panel">
+      <div class="row"><label>起點距離</label><input type="range" data-k="far" min="3" max="12" step="0.5"><output data-o="far"></output></div>
+      <div class="row"><label>終點距離</label><input type="range" data-k="near" min="2" max="12" step="0.5"><output data-o="near"></output></div>
+    </div>
+    <p>把「這一段捲了多少」換算成 0 到 1 之間的<strong>進度</strong>，再用進度在兩個數字之間取值（這個動作叫 <strong>lerp</strong>，線性內插）。相機沿著視線前進後退，叫<strong>推軌</strong>。</p>
+    <p>捲動不是「觸發」動畫，是「拖曳」動畫。你隨時可以停、可以往回，所以畫面只能由進度決定：同一個進度，永遠是同一個畫面。</p>
+    <p class="lead">這就是為什麼捲動動畫裡不會有「播放」這個動作。沒有東西在播，是你在拖。</p>
+    <div class="runway"><p>進度 <b data-p></b>　繼續往下捲 ↓</p></div>
+  </section>
+
+  <section data-chapter="05" data-step="2" data-runway>
+    <p class="kicker">02　DAMPING</p>
+    <h2>相機是用追的</h2>
+    <p>先取消勾選「平滑跟隨」，用滑鼠滾輪一格一格地捲。再勾起來捲一次。</p>
+    <div class="panel">
+      <label class="check"><input type="checkbox" data-k="smoothOn"> 平滑跟隨</label>
+      <div class="row"><label>阻尼</label><input type="range" data-k="damp" min="0.01" max="0.5" step="0.01"><output data-o="damp"></output></div>
+    </div>
+    <pre>const 目標 = lerp(<b data-c="far"></b>, <b data-c="near"></b>, 進度);
+<i>// 每一幀只追上差距的一小部分</i>
+camera.position.z += (目標 - camera.position.z) * <b data-c="damp"></b>;</pre>
+    <p>滾輪給的捲動是一格一格的，直接對應的話相機會跟著一頓一頓。平滑跟隨的做法是：相機不直接跳到目標，而是每一幀只走差距的一小段。那個比例就是<strong>阻尼</strong>。數字越小越黏、越滑；太小的話，你停下來了它還在動。</p>
+    <p class="lead">阻尼 0.1 左右是常見的起點。它讓便宜的滑鼠捲起來像昂貴的觸控板。</p>
+    <div class="runway"><p>進度 <b data-p></b>　繼續往下捲 ↓</p></div>
+  </section>
+
+  <section data-chapter="05" data-step="3" data-runway>
+    <p class="kicker">03　PATH</p>
+    <h2>沿一條線走，盯著一個點</h2>
+    <p>右下角的小視窗又出現了。綠色的線是相機要走的路。調整旋鈕，看線怎麼變，然後往下捲。</p>
+    <div class="panel">
+      <div class="row"><label>環繞角度</label><input type="range" data-k="a1" min="-270" max="270" step="5"><output data-o="a1" data-u="°"></output></div>
+      <div class="row"><label>終點高度</label><input type="range" data-k="h1" min="-3" max="5" step="0.1"><output data-o="h1"></output></div>
+      <div class="row"><label>注視點高度</label><input type="range" data-k="look" min="-1.5" max="1.5" step="0.05"><output data-o="look"></output></div>
+    </div>
+    <pre>const 角度 = lerp(0, <b data-c="a1"></b>, 進度);
+camera.position.set(
+  sin(角度) * 5.5, lerp(0.5, <b data-c="h1"></b>, 進度), cos(角度) * 5.5);
+camera.lookAt(0, <b data-c="look"></b>, 0);</pre>
+    <p>相機繞著主角轉，叫<strong>環繞</strong>。它需要兩樣東西：一條路徑（相機在哪裡），和一個<strong>注視點</strong>（相機看哪裡）。把注視點往上移，星星就會落到畫面下方。</p>
+    <p>到這裡，相機的三種基本動作都出現了：第一章的<strong>變焦</strong>（改視角）、上一段的<strong>推軌</strong>（改距離）、這一段的環繞（改角度）。三者可以同時發生。</p>
+    <p class="lead">運鏡的描述，就是在說這三件事各自從多少變到多少。</p>
+    <div class="runway"><p>進度 <b data-p></b>　繼續往下捲 ↓</p></div>
+  </section>
+
+  <section data-chapter="05" data-step="4">
+    <p class="kicker">04　SHOTS</p>
+    <h2>每一段有自己的鏡位</h2>
+    <p>按三個鏡位切換看看。然後把切換方式改成「硬切」再按一次。</p>
+    <div class="panel">
+      <div class="btns">
+        <button type="button" data-k="shot" data-v="0">正面</button>
+        <button type="button" data-k="shot" data-v="1">仰角貼近</button>
+        <button type="button" data-k="shot" data-v="2">俯瞰</button>
+      </div>
+      <div class="btns">
+        <button type="button" data-k="cut" data-v="ease">過渡</button>
+        <button type="button" data-k="cut" data-v="cut">硬切</button>
+      </div>
+      <div class="row"><label>過渡時長</label><input type="range" data-k="dur" min="0.3" max="4" step="0.1"><output data-o="dur" data-u=" 秒"></output></div>
+    </div>
+    <pre>const shots = [
+  { pos: [0, 0.5, 5.2],      fov: 50 },  <i>// 正面</i>
+  { pos: [3.0, -1.4, 2.4],   fov: 72 },  <i>// 仰角貼近</i>
+  { pos: [-1.6, 4.6, 3.0],   fov: 34 },  <i>// 俯瞰</i>
+];
+moveCameraTo(shots[<b data-c="shot"></b>]);</pre>
+    <p>一組「位置、注視點、視角」叫一個<strong>鏡位</strong>。從一個鏡位到下一個，可以<strong>硬切</strong>（直接跳過去），也可以<strong>過渡</strong>（滑過去）。</p>
+    <p>其實這本書從第二章開始就在這樣做：每一章開頭相機都悄悄換了位置。從現在起，它是一份明確的資料，每一段都可以指定自己的鏡位。</p>
+    <p class="lead">過渡讓人知道「我們還在同一個地方」，硬切讓人知道「換話題了」。兩個都是工具。</p>
+  </section>
+
+  <section data-chapter="05" data-step="5" data-runway>
+    <p class="kicker">05　ONE TAKE</p>
+    <h2>一個完整的鏡頭</h2>
+    <p>把上面的東西組起來：推軌、環繞、升高同時發生，帶 0.1 的阻尼。這一段沒有旋鈕，只有一條比較長的路。慢慢捲。</p>
+    <pre><i>// 進度 0 → 1（現在是 <b data-p></b>）</i>
+角度：0° → 120°
+距離：7 → 3
+高度：0.4 → 1.3</pre>
+    <div class="runway long"><p>進度 <b data-p></b>　繼續往下捲 ↓</p></div>
+  </section>
+
+  <section data-chapter="05" data-step="6">
+    <p class="kicker">06　怎麼說</p>
+    <h2>這一章給你的詞彙</h2>
+    <p>路徑線和小視窗都拆了。定下來的是那個鏡頭，以及一套規則：每一段有自己的鏡位，段落之間用過渡。</p>
+    <dl>
+      <dt>推軌</dt><dd>相機本身前進或後退。透視會跟著變。</dd>
+      <dt>變焦</dt><dd>相機不動，改視角。透視不變，只是裁得更緊。</dd>
+      <dt>環繞</dt><dd>相機繞著主角轉，始終看著它。</dd>
+      <dt>注視點</dt><dd>相機看向的那個點。移動它，主角在畫面裡的位置就變了。</dd>
+      <dt>鏡位</dt><dd>一組位置、注視點、視角。</dd>
+      <dt>硬切／過渡</dt><dd>鏡位之間直接跳，或滑過去。</dd>
+      <dt>阻尼</dt><dd>相機追上目標的黏度。</dd>
+      <dt>拖曳式</dt><dd>動畫由捲動進度決定，可以隨時停、隨時倒退。</dd>
+    </dl>
+    <p>同一個需求，從模糊到精確：</p>
+    <blockquote>✕　「捲下去的時候鏡頭動一下。」</blockquote>
+    <blockquote>○　「在這段捲動裡，相機從正面繞到右後方 120 度，同時推近到距離 3、略微升高；跟隨帶一點阻尼，段落之間用過渡，不要硬切。」</blockquote>
+    <ol class="next" data-toc="5"></ol>
+  </section>
+
+</div>
